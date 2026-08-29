@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-[#FAFAFA] text-ink;
+}
+
+/* Dibungkus @layer components biar utility class (misal pl-10) bisa nge-override
+   class custom ini kalau dipakai bareng — tanpa ini, class custom selalu menang
+   di cascade CSS walau ditulis belakangan di className. */
+@layer components {
+  .btn-primary {
+    @apply bg-brand hover:bg-brand-dark text-white font-medium rounded-full px-6 py-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .input-field {
+    @apply w-full rounded-xl border border-gray-200 px-4 py-3 text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition bg-white;
+  }
+
+  .card {
+    @apply bg-white rounded-card border border-gray-100 transition-shadow;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.03);
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium;
+  }
+}
