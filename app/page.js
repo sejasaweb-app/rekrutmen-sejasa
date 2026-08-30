@@ -15,42 +15,50 @@ import {
 import Logo from "@/components/Logo";
 import PhotoPlaceholder from "@/components/PhotoPlaceholder";
 
+// Palet dikurasi — 4 warna yang berasa satu keluarga sama brand magenta,
+// bukan random warna default Tailwind.
 const BENEFITS = [
   {
     icon: Users,
     title: "Pelanggan Langsung dari Sejasa",
     desc: "Ga perlu cari pelanggan sendiri — kami yang salurkan orderan ke kamu.",
-    color: "#E6007E",
+    from: "#F0169B",
+    to: "#A80057",
   },
   {
     icon: Clock,
     title: "Atur Jadwal Sendiri",
     desc: "Kerja fleksibel, kamu yang tentukan kapan mau aktif terima orderan.",
-    color: "#3B82F6",
+    from: "#7C3AED",
+    to: "#5B21B6",
   },
   {
     icon: Wallet,
     title: "Penghasilan Tambahan",
     desc: "Potensi income harian dari tiap orderan yang kamu selesaikan.",
-    color: "#16A34A",
+    from: "#F59E0B",
+    to: "#B45309",
   },
   {
     icon: ShieldCheck,
     title: "Pembayaran Aman & Tepat Waktu",
     desc: "Sistem pembayaran jelas, ga perlu was-was soal transaksi.",
-    color: "#F59E0B",
+    from: "#0EA5A4",
+    to: "#0F766E",
   },
   {
     icon: Headphones,
     title: "Didukung Tim Sejasa",
     desc: "Ada tim yang siap bantu kalau kamu butuh dukungan di lapangan.",
-    color: "#8B5CF6",
+    from: "#7C3AED",
+    to: "#5B21B6",
   },
   {
     icon: Zap,
     title: "Proses Daftar Cepat",
     desc: "Isi form, verifikasi, langsung bisa mulai — ga ribet.",
-    color: "#EC4899",
+    from: "#F0169B",
+    to: "#A80057",
   },
 ];
 
@@ -61,6 +69,12 @@ const STEPS = [
   { icon: Sparkles, title: "Mulai Kerja", desc: "Terima orderan pertama kamu dari Sejasa." },
 ];
 
+// Tekstur dot-grid halus buat background, biar section ga polos rata
+const DOT_GRID = {
+  backgroundImage: "radial-gradient(circle, #E6007E22 1px, transparent 1px)",
+  backgroundSize: "24px 24px",
+};
+
 export default function HomePage() {
   return (
     <main className="min-h-screen overflow-x-hidden">
@@ -69,7 +83,7 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Logo size={32} rounded="rounded-lg" />
-            <span className="font-semibold text-sm hidden sm:inline">Dispatcher Sejasa</span>
+            <span className="font-display font-bold text-sm hidden sm:inline">Dispatcher Sejasa</span>
           </div>
           <Link
             href="/apply"
@@ -80,23 +94,27 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Hero — gradient background + decorative blur shapes */}
+      {/* Hero */}
       <section className="relative px-6 pt-16 pb-20 text-center overflow-hidden">
+        <div className="absolute inset-0 -z-20" style={DOT_GRID} />
         <div
           className="absolute inset-0 -z-10"
           style={{
             background:
-              "radial-gradient(ellipse 80% 60% at 50% 0%, #FDE6F1 0%, #FAFAFA 55%, #FAFAFA 100%)",
+              "radial-gradient(ellipse 75% 55% at 50% 0%, #FDE6F1 0%, #FAFAFA 60%, #FAFAFA 100%)",
           }}
         />
         <div className="absolute top-10 -left-24 w-72 h-72 rounded-full bg-brand/10 blur-3xl -z-10" />
-        <div className="absolute top-32 -right-20 w-72 h-72 rounded-full bg-blue-400/10 blur-3xl -z-10" />
+        <div className="absolute top-32 -right-20 w-72 h-72 rounded-full bg-purple-400/10 blur-3xl -z-10" />
 
-        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand bg-brand-light rounded-full px-3.5 py-1.5 mb-6">
-          <Sparkles size={13} />
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand bg-white shadow-sm rounded-full px-3.5 py-1.5 mb-6">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-60" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-brand" />
+          </span>
           Buka Pendaftaran Mitra
         </span>
-        <h1 className="text-4xl sm:text-5xl font-bold mb-5 max-w-2xl mx-auto leading-[1.1] tracking-tight">
+        <h1 className="font-display font-extrabold text-4xl sm:text-6xl mb-5 max-w-2xl mx-auto leading-[1.05] tracking-tight">
           Jadi Mitra <span className="text-brand">Dispatcher</span> Sejasa
         </h1>
         <p className="text-ink-muted text-lg max-w-lg mx-auto mb-9">
@@ -105,7 +123,7 @@ export default function HomePage() {
         </p>
         <Link
           href="/apply"
-          className="group inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-medium rounded-full px-7 py-3.5 transition shadow-lg shadow-brand/25"
+          className="group inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold rounded-full px-7 py-3.5 transition shadow-xl shadow-brand/25"
         >
           Daftar Jadi Mitra
           <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
@@ -121,11 +139,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Benefits — warna beda tiap card, hover lift */}
+      {/* Benefits */}
       <section className="px-6 py-20">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">Kenapa Gabung Jadi Mitra?</h2>
+            <h2 className="font-display font-bold text-3xl mb-3 tracking-tight">Kenapa Gabung Jadi Mitra?</h2>
             <p className="text-ink-muted max-w-md mx-auto">
               Beberapa keuntungan yang kamu dapat sebagai mitra Dispatcher Sejasa.
             </p>
@@ -136,15 +154,15 @@ export default function HomePage() {
               return (
                 <div
                   key={b.title}
-                  className="card p-6 hover:-translate-y-1 hover:shadow-lg transition-all duration-200"
+                  className="card p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-200"
                 >
                   <div
-                    className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
-                    style={{ backgroundColor: `${b.color}1A` }}
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-md"
+                    style={{ background: `linear-gradient(135deg, ${b.from}, ${b.to})` }}
                   >
-                    <Icon size={22} style={{ color: b.color }} />
+                    <Icon size={22} className="text-white" />
                   </div>
-                  <h3 className="font-semibold mb-1.5">{b.title}</h3>
+                  <h3 className="font-display font-semibold mb-1.5">{b.title}</h3>
                   <p className="text-sm text-ink-muted leading-relaxed">{b.desc}</p>
                 </div>
               );
@@ -153,17 +171,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Cara Bergabung — konek pakai garis */}
+      {/* Cara Bergabung */}
       <section className="px-6 py-20 bg-[#FAFAFA]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold mb-3">Cara Bergabung</h2>
+            <h2 className="font-display font-bold text-3xl mb-3 tracking-tight">Cara Bergabung</h2>
             <p className="text-ink-muted">4 langkah gampang buat mulai jadi mitra.</p>
           </div>
           <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-6">
             <div
               className="hidden lg:block absolute top-7 left-[12%] right-[12%] h-0.5 -z-0"
-              style={{ background: "linear-gradient(90deg, #E6007E33, #E6007E33)" }}
+              style={{ background: "linear-gradient(90deg, #E6007E44, #E6007E44)" }}
             />
             {STEPS.map((s, i) => {
               const Icon = s.icon;
@@ -171,8 +189,8 @@ export default function HomePage() {
                 <div key={s.title} className="relative text-center">
                   <div className="relative inline-flex mb-4">
                     <div
-                      className="w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-md shadow-brand/20"
-                      style={{ backgroundColor: "#E6007E" }}
+                      className="w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-brand/25"
+                      style={{ background: "linear-gradient(135deg, #F0169B, #A80057)" }}
                     >
                       <Icon size={24} />
                     </div>
@@ -180,7 +198,7 @@ export default function HomePage() {
                       {i + 1}
                     </span>
                   </div>
-                  <h3 className="font-semibold text-sm mb-1.5">{s.title}</h3>
+                  <h3 className="font-display font-semibold text-sm mb-1.5">{s.title}</h3>
                   <p className="text-xs text-ink-muted leading-relaxed">{s.desc}</p>
                 </div>
               );
@@ -193,11 +211,11 @@ export default function HomePage() {
       <section className="px-6 py-20">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">Kategori Layanan</h2>
+            <h2 className="font-display font-bold text-3xl mb-3 tracking-tight">Kategori Layanan</h2>
             <p className="text-ink-muted">Pilih kategori yang paling sesuai sama skill kamu.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="card overflow-hidden hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+            <div className="card overflow-hidden hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
               <PhotoPlaceholder
                 src="/images/foto-massage.jpg"
                 label="Foto mitra Massage"
@@ -205,7 +223,10 @@ export default function HomePage() {
                 rounded=""
               />
               <div className="p-5">
-                <span className="text-xs font-semibold text-brand bg-brand-light rounded-full px-2.5 py-1">
+                <span
+                  className="text-xs font-semibold text-white rounded-full px-2.5 py-1"
+                  style={{ background: "linear-gradient(135deg, #F0169B, #A80057)" }}
+                >
                   Massage
                 </span>
                 <p className="text-sm text-ink-muted mt-3">
@@ -213,7 +234,7 @@ export default function HomePage() {
                 </p>
               </div>
             </div>
-            <div className="card overflow-hidden hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+            <div className="card overflow-hidden hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
               <PhotoPlaceholder
                 src="/images/foto-cleaning.jpg"
                 label="Foto mitra Daily Cleaning"
@@ -221,7 +242,10 @@ export default function HomePage() {
                 rounded=""
               />
               <div className="p-5">
-                <span className="text-xs font-semibold text-blue-600 bg-blue-50 rounded-full px-2.5 py-1">
+                <span
+                  className="text-xs font-semibold text-white rounded-full px-2.5 py-1"
+                  style={{ background: "linear-gradient(135deg, #7C3AED, #5B21B6)" }}
+                >
                   Daily Cleaning
                 </span>
                 <p className="text-sm text-ink-muted mt-3">
@@ -233,11 +257,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Komunitas — foto gathering */}
+      {/* Komunitas */}
       <section className="px-6 py-20 bg-[#FAFAFA]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-3">Komunitas Mitra Sejasa</h2>
+            <h2 className="font-display font-bold text-3xl mb-3 tracking-tight">Komunitas Mitra Sejasa</h2>
             <p className="text-ink-muted max-w-md mx-auto">
               Kamu ga sendirian — jadi bagian dari komunitas mitra yang saling
               support satu sama lain.
@@ -263,23 +287,32 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA penutup — full-bleed gradient background */}
+      {/* CTA penutup */}
       <section className="relative px-6 py-20 text-center overflow-hidden">
         <div
-          className="absolute inset-0 -z-10"
+          className="absolute inset-0 -z-20"
           style={{ background: "linear-gradient(135deg, #F0169B, #A80057)" }}
+        />
+        <div
+          className="absolute inset-0 -z-10 opacity-[0.07]"
+          style={{
+            backgroundImage: "radial-gradient(circle, #ffffff 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
         />
         <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-white/10 blur-3xl -z-10" />
         <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10 blur-3xl -z-10" />
 
-        <h2 className="text-3xl font-bold mb-3 text-white">Siap Gabung Jadi Mitra?</h2>
+        <h2 className="font-display font-bold text-3xl mb-3 text-white tracking-tight">
+          Siap Gabung Jadi Mitra?
+        </h2>
         <p className="text-white/80 max-w-md mx-auto mb-9">
           Daftar sekarang, tim kami bakal hubungi kamu lewat WhatsApp atau telepon
           setelah lamaran kamu ditinjau.
         </p>
         <Link
           href="/apply"
-          className="group inline-flex items-center gap-2 bg-white text-brand font-medium rounded-full px-7 py-3.5 transition hover:bg-gray-50 shadow-lg"
+          className="group inline-flex items-center gap-2 bg-white text-brand font-semibold rounded-full px-7 py-3.5 transition hover:bg-gray-50 shadow-xl"
         >
           Daftar Jadi Mitra
           <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
