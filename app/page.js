@@ -223,6 +223,7 @@ export default function HomePage() {
                 label="Foto mitra Massage"
                 aspect="aspect-[16/9] sm:aspect-[4/3]"
                 rounded=""
+                frame={false}
               />
               <div className="p-4 sm:p-5">
                 <span
@@ -242,6 +243,7 @@ export default function HomePage() {
                 label="Foto mitra Daily Cleaning"
                 aspect="aspect-[16/9] sm:aspect-[4/3]"
                 rounded=""
+                frame={false}
               />
               <div className="p-4 sm:p-5">
                 <span
