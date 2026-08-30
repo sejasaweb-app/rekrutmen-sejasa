@@ -372,7 +372,7 @@ export default function ApplyPage() {
               <label className="block text-sm font-medium mb-1.5">
                 Bisa Melayani Gender Apa?
               </label>
-              <div className="flex gap-2">
+              <div className="grid grid-cols-1 gap-2">
                 {[
                   { value: "wanita", label: "Wanita Saja" },
                   { value: "pria", label: "Pria Saja" },
@@ -382,7 +382,7 @@ export default function ApplyPage() {
                     type="button"
                     key={opt.value}
                     onClick={() => updateField("melayani_gender", opt.value)}
-                    className={`flex-1 rounded-xl border px-3 py-3 text-xs sm:text-sm font-medium transition bg-white ${
+                    className={`rounded-xl border px-4 py-3 text-sm font-medium transition bg-white text-left ${
                       form.melayani_gender === opt.value
                         ? "border-brand text-brand"
                         : "border-gray-200 text-ink-muted"

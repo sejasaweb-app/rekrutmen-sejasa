@@ -134,7 +134,7 @@ export default function HomePage() {
           <PhotoPlaceholder
             src="/images/foto-hero.jpg"
             label="Foto hero — misal foto gathering bareng mitra"
-            aspect="aspect-[16/7]"
+            aspect="aspect-[4/3] sm:aspect-[16/7]"
           />
         </div>
       </section>
