@@ -8,8 +8,9 @@ import { useState } from "react";
  * Placeholder foto — otomatis pakai foto asli kalau file-nya udah ada di public/images/,
  * kalau belum ada, tampilin placeholder yang tetep enak dilihat (bukan broken image icon).
  *
- * Foto asli dikasih frame tipis + watermark "sejasa.com" pojok kanan bawah,
- * biar keliatan proper dan konsisten di semua ukuran layar.
+ * Foto asli dibungkus frame premium: shadow berlapis biar kesan "ngambang",
+ * sheen tipis di atas, watermark "sejasa.com" model frosted-glass pill di
+ * pojok kanan bawah (bukan kotak putih polos), dan efek zoom halus pas di-hover.
  */
 export default function PhotoPlaceholder({
   src,
@@ -22,10 +23,10 @@ export default function PhotoPlaceholder({
 
   return (
     <div
-      className={`relative w-full ${aspect} ${rounded} overflow-hidden ${
+      className={`group relative w-full ${aspect} ${rounded} overflow-hidden ${
         failed
           ? "border-2 border-dashed border-brand/25 bg-gradient-to-br from-brand-light to-gray-50"
-          : "ring-1 ring-inset ring-black/10"
+          : "ring-1 ring-black/[0.06] shadow-[0_2px_6px_rgba(16,24,40,0.06),0_12px_28px_-8px_rgba(16,24,40,0.18)]"
       }`}
     >
       {!failed && (
@@ -34,22 +35,28 @@ export default function PhotoPlaceholder({
             src={src}
             alt={label}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.045]"
             onError={() => setFailed(true)}
           />
+
+          {/* Sheen tipis di atas biar foto ga keliatan flat */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.14] via-transparent to-transparent" />
+
           {watermark && (
             <>
-              {/* Gradient halus biar watermark tetep kebaca di foto terang maupun gelap */}
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[38%] bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
-              <div className="pointer-events-none absolute bottom-2 right-2.5 sm:bottom-3 sm:right-3.5 flex items-center gap-1 sm:gap-1.5 [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.45))]">
+              {/* Gradient lembut buat depth + jaga kontras watermark */}
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[34%] bg-gradient-to-t from-black/35 to-transparent" />
+
+              {/* Watermark: frosted-glass pill, bukan solid putih */}
+              <div className="pointer-events-none absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3.5 flex items-center gap-1.5 rounded-full pl-1.5 pr-2.5 py-1 bg-white/15 backdrop-blur-md ring-1 ring-white/25 shadow-sm">
                 <Image
-                  src="/logo-white.png"
+                  src="/logo.png"
                   alt="Sejasa"
-                  width={18}
-                  height={18}
-                  className="w-3.5 h-3.5 sm:w-[18px] sm:h-[18px] object-contain"
+                  width={16}
+                  height={16}
+                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain drop-shadow-sm"
                 />
-                <span className="text-white text-[11px] sm:text-xs font-bold tracking-tight">
+                <span className="text-white text-[11px] sm:text-xs font-bold tracking-tight [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">
                   sejasa.com
                 </span>
               </div>
