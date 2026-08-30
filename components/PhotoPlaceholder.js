@@ -13,7 +13,9 @@ export default function PhotoPlaceholder({ src, label, aspect, rounded = "rounde
 
   return (
     <div
-      className={`relative w-full ${aspect} ${rounded} overflow-hidden bg-gradient-to-br from-brand-light to-gray-100`}
+      className={`relative w-full ${aspect} ${rounded} overflow-hidden ${
+        failed ? "border-2 border-dashed border-brand/25 bg-gradient-to-br from-brand-light to-gray-50" : ""
+      }`}
     >
       {!failed && (
         <Image
@@ -25,9 +27,11 @@ export default function PhotoPlaceholder({ src, label, aspect, rounded = "rounde
         />
       )}
       {failed && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-          <ImageIcon size={28} className="text-brand/40" />
-          <span className="text-xs text-ink-muted px-4 text-center">{label}</span>
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5">
+          <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center shadow-sm">
+            <ImageIcon size={18} className="text-brand" />
+          </div>
+          <span className="text-xs text-ink-muted px-4 text-center max-w-[180px]">{label}</span>
         </div>
       )}
     </div>
