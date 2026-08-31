@@ -136,28 +136,30 @@ export default function HomePage() {
         </div>
 
         {/* Social proof — angka riil pekerjaan yang udah diselesaikan mitra */}
-        <div className="flex items-center justify-center gap-3 mt-8 sm:mt-10">
-          <div className="flex -space-x-3">
-            {["1", "2", "3"].map((n) => (
-              <div
-                key={n}
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden ring-2 ring-white shadow-sm relative"
-              >
-                <PhotoPlaceholder
-                  src={`/images/foto-komunitas-${n}.jpg`}
-                  label=""
-                  aspect="aspect-square"
-                  rounded="rounded-full"
-                  frame={false}
-                  watermark={false}
-                />
-              </div>
-            ))}
+        <div className="flex justify-center mt-8 sm:mt-10">
+          <div className="inline-flex items-center gap-3 sm:gap-4 bg-white rounded-full pl-2 pr-5 sm:pl-2.5 sm:pr-6 py-2 sm:py-2.5 shadow-lg shadow-black/[0.06] ring-1 ring-black/[0.04]">
+            <div className="flex -space-x-3 shrink-0">
+              {["1", "2", "3"].map((n) => (
+                <div
+                  key={n}
+                  className="w-9 h-9 sm:w-11 sm:h-11 rounded-full overflow-hidden ring-2 ring-white shadow-sm relative"
+                >
+                  <PhotoPlaceholder
+                    src={`/images/foto-komunitas-${n}.jpg`}
+                    label=""
+                    aspect="aspect-square"
+                    rounded="rounded-full"
+                    frame={false}
+                    watermark={false}
+                  />
+                </div>
+              ))}
+            </div>
+            <span className="text-sm sm:text-base text-ink-muted text-left leading-snug">
+              <span className="font-extrabold text-brand text-base sm:text-xl">2.500+</span>{" "}
+              pekerjaan diselesaikan mitra Dispatcher Sejasa
+            </span>
           </div>
-          <span className="text-xs sm:text-sm text-ink-muted text-left">
-            <span className="font-bold text-ink">2.500+</span> pekerjaan udah
-            diselesaikan mitra Dispatcher Sejasa
-          </span>
         </div>
       </section>
 
