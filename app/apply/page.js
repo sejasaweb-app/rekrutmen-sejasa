@@ -106,6 +106,11 @@ export default function ApplyPage() {
       }
     }
 
+    if (!file) {
+      toast.error("Upload dulu sertifikat/paklaring/rating kamu ya");
+      return;
+    }
+
     if (form.kategori === "massage" && !form.melayani_gender) {
       toast.error("Pilih dulu gender yang bisa kamu layani");
       return;
@@ -420,7 +425,7 @@ export default function ApplyPage() {
 
           <div>
             <label className="block text-sm font-medium mb-1.5">
-              Sertifikat / Paklaring / Rating App Sebelumnya
+              Sertifikat / Paklaring / Rating App Sebelumnya <span className="text-red-500">*</span>
             </label>
             <input
               type="file"

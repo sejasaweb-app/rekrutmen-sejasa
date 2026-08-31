@@ -46,6 +46,13 @@ export async function POST(request) {
       return NextResponse.json({ error: "Data belum lengkap" }, { status: 400 });
     }
 
+    if (!file_url) {
+      return NextResponse.json(
+        { error: "Wajib upload sertifikat/paklaring/rating" },
+        { status: 400 }
+      );
+    }
+
     // --- Rate limit per IP: maks 5 percobaan per jam ---
     const ip =
       request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
