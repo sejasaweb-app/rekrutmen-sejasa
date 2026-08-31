@@ -28,16 +28,16 @@ export default function CategoryVisual({ icon: Icon, from, to, aspect }) {
 
       <div className="relative">
         <div
-          className="w-20 h-20 sm:w-24 sm:h-24 rounded-[26px] flex items-center justify-center"
+          className="w-24 h-24 sm:w-28 sm:h-28 rounded-[28px] flex items-center justify-center"
           style={{
             background: `linear-gradient(135deg, ${from}, ${to})`,
             boxShadow: `0 18px 32px -14px ${from}70`,
           }}
         >
-          <Icon size={38} className="text-white" strokeWidth={1.6} />
+          <Icon size={44} className="text-white" strokeWidth={1.6} />
         </div>
-        <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-md ring-1 ring-black/5">
-          <Sparkles size={14} style={{ color: from }} />
+        <div className="absolute -top-2.5 -right-2.5 w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-md ring-1 ring-black/5">
+          <Sparkles size={16} style={{ color: from }} />
         </div>
       </div>
     </div>

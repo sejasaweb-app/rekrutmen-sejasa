@@ -23,7 +23,7 @@ import CategoryVisual from "@/components/CategoryVisual";
 const BENEFITS = [
   {
     icon: MapPin,
-    title: "Job Sesuai Jangkauan Wilayah",
+    title: "Job Sesuai Wilayah",
     desc: "Orderan yang masuk disesuaikan sama radius wilayah kerja kamu, jadi lebih dekat dan efisien.",
     from: "#F0169B",
     to: "#A80057",
@@ -240,7 +240,7 @@ export default function HomePage() {
                 icon={Hand}
                 from="#F0169B"
                 to="#A80057"
-                aspect="aspect-[16/9] sm:aspect-[4/3]"
+                aspect="aspect-[16/9]"
               />
               <div className="p-4 sm:p-5">
                 <span
@@ -259,7 +259,7 @@ export default function HomePage() {
                 icon={SprayCan}
                 from="#7C3AED"
                 to="#5B21B6"
-                aspect="aspect-[16/9] sm:aspect-[4/3]"
+                aspect="aspect-[16/9]"
               />
               <div className="p-4 sm:p-5">
                 <span
