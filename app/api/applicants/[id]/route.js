@@ -41,3 +41,24 @@ export async function PATCH(request, { params }) {
     return NextResponse.json({ error: "Gagal update status" }, { status: 500 });
   }
 }
+
+// DELETE — admin hapus data pendaftar
+export async function DELETE(request, { params }) {
+  try {
+    const supabase = supabaseAdmin();
+
+    // Hapus riwayat follow-up dulu (contact_logs belum tentu punya ON DELETE CASCADE)
+    await supabase.from("contact_logs").delete().eq("applicant_id", params.id);
+
+    const { error } = await supabase
+      .from("applicants")
+      .delete()
+      .eq("id", params.id);
+
+    if (error) throw error;
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("Delete applicant error:", err);
+    return NextResponse.json({ error: "Gagal menghapus data" }, { status: 500 });
+  }
+}

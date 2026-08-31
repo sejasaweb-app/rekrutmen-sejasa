@@ -147,7 +147,7 @@ export default function ApplicantDetailPage() {
     <div className="max-w-2xl">
       <Toaster position="top-center" />
       <button
-        onClick={() => router.push("/admin")}
+        onClick={() => router.back()}
         className="flex items-center gap-1.5 text-sm text-ink-muted mb-4 hover:text-brand transition"
       >
         <ArrowLeft size={15} />

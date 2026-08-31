@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import Link from "next/link";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import toast, { Toaster } from "react-hot-toast";
 import {
   Users,
   Sparkles,
@@ -12,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   MessageCircle,
+  Trash2,
 } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 
@@ -50,16 +53,32 @@ const FUNNEL_STEPS = [
   { value: "rejected", label: "Ditolak", color: "#DC2626" },
 ];
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE_OPTIONS = [20, 50, 100];
 
-export default function AdminDashboardPage() {
+function AdminDashboardContent() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [summary, setSummary] = useState(null);
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState("");
-  const [kategori, setKategori] = useState("");
-  const [q, setQ] = useState("");
-  const [page, setPage] = useState(1);
+  const [deletingId, setDeletingId] = useState(null);
+
+  // Filter & pagination state — nilai awal diambil dari URL, jadi kalau user
+  // pencet tombol back dari halaman detail, dia balik ke state yang sama persis
+  // (filter, pencarian, halaman, dan jumlah baris per halaman) bukan ke default.
+  const [status, setStatus] = useState(searchParams.get("status") || "");
+  const [kategori, setKategori] = useState(searchParams.get("kategori") || "");
+  const [q, setQ] = useState(searchParams.get("q") || "");
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
+  const [pageSize, setPageSize] = useState(
+    PAGE_SIZE_OPTIONS.includes(Number(searchParams.get("pageSize")))
+      ? Number(searchParams.get("pageSize"))
+      : PAGE_SIZE_OPTIONS[0]
+  );
+
+  const isFirstFilterRun = useRef(true);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -78,16 +97,57 @@ export default function AdminDashboardPage() {
     setSummary(summaryData);
     setApplicants(listData.applicants || []);
     setLoading(false);
-    setPage(1);
   }, [status, kategori, q]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
+  // Reset ke halaman 1 setiap kali filter/pencarian berubah karena aksi user
+  // (bukan saat mount pertama, biar page dari URL tetap kepakai waktu balik dari detail).
+  useEffect(() => {
+    if (isFirstFilterRun.current) {
+      isFirstFilterRun.current = false;
+      return;
+    }
+    setPage(1);
+  }, [status, kategori, q, pageSize]);
+
+  // Simpan kombinasi filter/halaman ke URL (replace, ga nambah history baru)
+  // biar tombol back browser dari halaman detail balik ke state list yang sama.
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (status) params.set("status", status);
+    if (kategori) params.set("kategori", kategori);
+    if (q) params.set("q", q);
+    if (page > 1) params.set("page", String(page));
+    if (pageSize !== PAGE_SIZE_OPTIONS[0]) params.set("pageSize", String(pageSize));
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }, [status, kategori, q, page, pageSize, pathname, router]);
+
+  async function handleDelete(id, nama) {
+    if (!window.confirm(`Hapus data "${nama}"? Data ini ga bisa dikembalikan lagi.`)) return;
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/applicants/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      setApplicants((prev) => prev.filter((a) => a.id !== id));
+      toast.success("Data berhasil dihapus");
+      fetch("/api/dashboard/summary", { cache: "no-store" })
+        .then((r) => r.json())
+        .then(setSummary);
+    } catch {
+      toast.error("Gagal menghapus data, coba lagi ya");
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   const funnelTotal = summary?.total || 0;
-  const totalPages = Math.max(1, Math.ceil(applicants.length / PAGE_SIZE));
-  const paginated = applicants.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(applicants.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const paginated = applicants.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   function exportCsv() {
     const headers = ["Nama", "Email", "No Telp", "Gender", "Domisili", "Kategori", "Punya Motor", "Status", "Tanggal Daftar"];
@@ -116,6 +176,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div>
+      <Toaster position="top-center" />
       <div className="flex items-start justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold mb-1">Dashboard Rekrutmen Mitra</h1>
@@ -223,7 +284,7 @@ export default function AdminDashboardPage() {
                 <th className="px-4 py-3 font-semibold">Motor</th>
                 <th className="px-4 py-3 font-semibold">Status</th>
                 <th className="px-4 py-3 font-semibold">Tanggal</th>
-                <th className="px-4 py-3 font-semibold"></th>
+                <th className="px-4 py-3 font-semibold text-right">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -267,18 +328,28 @@ export default function AdminDashboardPage() {
                       {new Date(a.created_at).toLocaleDateString("id-ID")}
                     </td>
                     <td className="px-4 py-3">
-                      {toWhatsAppLink(a.no_telp) && (
-                        <a
-                          href={toWhatsAppLink(a.no_telp)}
-                          target="_blank"
-                          rel="noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          title="Buka WhatsApp"
-                          className="inline-flex items-center justify-center w-7 h-7 rounded-full text-green-600 hover:bg-green-50 transition"
+                      <div className="flex items-center justify-end gap-1">
+                        {toWhatsAppLink(a.no_telp) && (
+                          <a
+                            href={toWhatsAppLink(a.no_telp)}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            title="Buka WhatsApp"
+                            className="inline-flex items-center justify-center w-7 h-7 rounded-full text-green-600 hover:bg-green-50 transition"
+                          >
+                            <MessageCircle size={15} />
+                          </a>
+                        )}
+                        <button
+                          onClick={() => handleDelete(a.id, a.nama)}
+                          disabled={deletingId === a.id}
+                          title="Hapus data"
+                          className="inline-flex items-center justify-center w-7 h-7 rounded-full text-red-500 hover:bg-red-50 transition disabled:opacity-40 disabled:cursor-not-allowed"
                         >
-                          <MessageCircle size={15} />
-                        </a>
-                      )}
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -287,31 +358,53 @@ export default function AdminDashboardPage() {
           </table>
         </div>
 
-        {!loading && applicants.length > PAGE_SIZE && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 text-sm">
+        {!loading && applicants.length > 0 && (
+          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 border-t border-gray-100 text-sm">
             <span className="text-ink-muted">
-              Halaman {page} dari {totalPages} · {applicants.length} total
+              Halaman {currentPage} dari {totalPages} · {applicants.length} total
             </span>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="p-1.5 rounded-lg border border-gray-200 disabled:opacity-30 hover:border-brand hover:text-brand transition"
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="p-1.5 rounded-lg border border-gray-200 disabled:opacity-30 hover:border-brand hover:text-brand transition"
-              >
-                <ChevronRight size={16} />
-              </button>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 text-ink-muted">
+                Tampilkan
+                <select
+                  className="input-field !w-auto !py-1.5 !px-3 text-sm"
+                  value={pageSize}
+                  onChange={(e) => setPageSize(Number(e.target.value))}
+                >
+                  {PAGE_SIZE_OPTIONS.map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+              </label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="p-1.5 rounded-lg border border-gray-200 disabled:opacity-30 hover:border-brand hover:text-brand transition"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="p-1.5 rounded-lg border border-gray-200 disabled:opacity-30 hover:border-brand hover:text-brand transition"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
             </div>
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+export default function AdminDashboardPage() {
+  return (
+    <Suspense fallback={<div className="text-sm text-ink-muted">Memuat dashboard...</div>}>
+      <AdminDashboardContent />
+    </Suspense>
   );
 }
 
