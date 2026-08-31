@@ -121,16 +121,37 @@ export async function GET(request) {
         ? decisionDurations.reduce((sum, d) => sum + d, 0) / decisionDurations.length
         : null;
 
-    // --- Top domisili ---
-    const domisiliCounts = {};
-    for (const a of applicants) {
-      const key = a.domisili?.trim() || "Tidak diketahui";
-      domisiliCounts[key] = (domisiliCounts[key] || 0) + 1;
+    // --- Top kota (diringkas dari domisili "Kecamatan, Kota" jadi kota aja) ---
+    // Data domisili disimpan sebagai "Kecamatan, Kota", tapi ada juga fallback manual
+    // tanpa koma. Kita ambil bagian kota-nya aja biar analitiknya ga kepecah-pecah
+    // per kecamatan (misal 5 pendaftar Jakarta Barat kepecah jadi 5 kecamatan beda).
+    function extractKota(domisili) {
+      const trimmed = domisili?.trim();
+      if (!trimmed) return "Tidak diketahui";
+      const parts = trimmed.split(",");
+      const raw = parts.length > 1 ? parts[parts.length - 1].trim() : trimmed;
+      return raw.replace(/\s+/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
     }
-    const topDomisili = Object.entries(domisiliCounts)
+    const kotaCounts = {};
+    for (const a of applicants) {
+      const key = extractKota(a.domisili);
+      kotaCounts[key] = (kotaCounts[key] || 0) + 1;
+    }
+    const topDomisili = Object.entries(kotaCounts)
       .map(([domisili, count]) => ({ domisili, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
+
+    // --- Distribusi kategori ---
+    const KATEGORI_LABELS = { massage: "Massage", daily_cleaning: "Daily Cleaning" };
+    const categoryCounts = {};
+    for (const a of applicants) {
+      const key = KATEGORI_LABELS[a.kategori] || a.kategori || "Tidak diketahui";
+      categoryCounts[key] = (categoryCounts[key] || 0) + 1;
+    }
+    const categoryBreakdown = Object.entries(categoryCounts)
+      .map(([kategori, count]) => ({ kategori, count }))
+      .sort((a, b) => b.count - a.count);
 
     // --- Rekap follow-up ---
     const followUpByResponse = {};
@@ -152,6 +173,7 @@ export async function GET(request) {
         avgDaysToDecision,
         decisionCount: decisionDurations.length,
         topDomisili,
+        categoryBreakdown,
         followUpTotal: logs.length,
         followUpByResponse,
         followUpByChannel,

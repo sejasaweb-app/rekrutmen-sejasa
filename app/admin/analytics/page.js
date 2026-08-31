@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TrendingUp, Clock, MapPin, MessageCircle, Users } from "lucide-react";
+import { TrendingUp, Clock, MapPin, MessageCircle, Users, Tags } from "lucide-react";
 
 const STAGE_LABELS = {
   data_baru: "Data Baru",
@@ -22,6 +22,11 @@ const RANGE_OPTIONS = [
   { value: "90", label: "90 Hari" },
   { value: "all", label: "Semua" },
 ];
+
+const CATEGORY_COLORS = {
+  Massage: "#E6007E",
+  "Daily Cleaning": "#7C3AED",
+};
 
 export default function AnalyticsPage() {
   const [data, setData] = useState(null);
@@ -46,6 +51,7 @@ export default function AnalyticsPage() {
 
   const maxTrend = Math.max(1, ...data.trend.map((t) => t.count));
   const maxDomisili = Math.max(1, ...data.topDomisili.map((d) => d.count));
+  const maxCategory = Math.max(1, ...(data.categoryBreakdown || []).map((c) => c.count));
   const decisionTotal = data.approvedCount + data.rejectedCount;
   const approvalRate = decisionTotal > 0 ? Math.round((data.approvedCount / decisionTotal) * 100) : null;
 
@@ -195,12 +201,12 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top domisili */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Top kota */}
         <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
           <div className="flex items-center gap-2 mb-4">
             <MapPin size={16} className="text-ink-muted" />
-            <h2 className="font-display text-sm font-semibold">Top Domisili</h2>
+            <h2 className="font-display text-sm font-semibold">Top Kota</h2>
           </div>
           {data.topDomisili.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-6 text-center">
@@ -225,6 +231,45 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+
+        {/* Distribusi kategori */}
+        <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
+          <div className="flex items-center gap-2 mb-4">
+            <Tags size={16} className="text-ink-muted" />
+            <h2 className="font-display text-sm font-semibold">Distribusi Kategori</h2>
+          </div>
+          {!data.categoryBreakdown || data.categoryBreakdown.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center mb-2">
+                <Tags size={16} className="text-gray-300" />
+              </div>
+              <p className="text-sm text-ink-muted">Belum ada data di periode ini.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {data.categoryBreakdown.map((c) => {
+                const pct = data.total > 0 ? Math.round((c.count / data.total) * 100) : 0;
+                const color = CATEGORY_COLORS[c.kategori] || "#94A3B8";
+                return (
+                  <div key={c.kategori}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm">{c.kategori}</span>
+                      <span className="text-sm font-semibold">
+                        {c.count} <span className="text-xs text-ink-muted font-normal">({pct}%)</span>
+                      </span>
+                    </div>
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{ width: `${(c.count / maxCategory) * 100}%`, backgroundColor: color }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
