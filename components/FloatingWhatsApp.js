@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { MessageCircle, X } from "lucide-react";
+import { X } from "lucide-react";
+import WhatsAppIcon from "./WhatsAppIcon";
 
 const WHATSAPP_NUMBER = "6285117246897";
 const DEFAULT_MESSAGE = "Halo, saya mau tanya soal pendaftaran Mitra Dispatcher Sejasa.";
@@ -51,7 +52,7 @@ export default function FloatingWhatsApp() {
           className="absolute inline-flex h-full w-full rounded-full opacity-40 animate-ping"
           style={{ backgroundColor: "#25D366" }}
         />
-        <MessageCircle size={26} className="relative text-white" />
+        <WhatsAppIcon size={28} className="relative text-white" />
       </a>
     </div>
   );
