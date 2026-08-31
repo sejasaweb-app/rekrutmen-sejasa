@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Plus_Jakarta_Sans, Sora } from "next/font/google";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -21,7 +22,10 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="id" className={`${jakarta.variable} ${sora.variable}`}>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        {children}
+        <FloatingWhatsApp />
+      </body>
     </html>
   );
 }
