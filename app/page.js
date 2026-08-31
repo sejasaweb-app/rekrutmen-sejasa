@@ -11,9 +11,12 @@ import {
   GraduationCap,
   Sparkles,
   ArrowRight,
+  Hand,
+  SprayCan,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import PhotoPlaceholder from "@/components/PhotoPlaceholder";
+import CategoryVisual from "@/components/CategoryVisual";
 
 // Palet dikurasi — 4 warna yang berasa satu keluarga sama brand magenta,
 // bukan random warna default Tailwind.
@@ -219,12 +222,11 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="card overflow-hidden hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
-              <PhotoPlaceholder
-                src="/images/foto-massage.jpg"
-                label="Foto mitra Massage"
+              <CategoryVisual
+                icon={Hand}
+                from="#F0169B"
+                to="#A80057"
                 aspect="aspect-[16/9] sm:aspect-[4/3]"
-                rounded=""
-                frame={false}
               />
               <div className="p-4 sm:p-5">
                 <span
@@ -239,12 +241,11 @@ export default function HomePage() {
               </div>
             </div>
             <div className="card overflow-hidden hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
-              <PhotoPlaceholder
-                src="/images/foto-cleaning.jpg"
-                label="Foto mitra Daily Cleaning"
+              <CategoryVisual
+                icon={SprayCan}
+                from="#7C3AED"
+                to="#5B21B6"
                 aspect="aspect-[16/9] sm:aspect-[4/3]"
-                rounded=""
-                frame={false}
               />
               <div className="p-4 sm:p-5">
                 <span
