@@ -98,7 +98,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero */}
-      <section className="relative px-4 sm:px-6 pt-10 pb-14 sm:pt-16 sm:pb-24 text-center overflow-hidden">
+      <section className="relative px-4 sm:px-6 pt-10 pb-12 sm:pt-16 sm:pb-16 text-center overflow-hidden">
         <div className="absolute inset-0 -z-20" style={DOT_GRID} />
         <div
           className="absolute inset-0 -z-10"
@@ -131,6 +131,30 @@ export default function HomePage() {
           Daftar Jadi Mitra
           <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
         </Link>
+
+        {/* Social proof ringan — preview foto mitra asli, bukan angka klaim */}
+        <div className="flex items-center justify-center gap-3 mt-8 sm:mt-10">
+          <div className="flex -space-x-3">
+            {["1", "2", "3"].map((n) => (
+              <div
+                key={n}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden ring-2 ring-white shadow-sm relative"
+              >
+                <PhotoPlaceholder
+                  src={`/images/foto-komunitas-${n}.jpg`}
+                  label=""
+                  aspect="aspect-square"
+                  rounded="rounded-full"
+                  frame={false}
+                  watermark={false}
+                />
+              </div>
+            ))}
+          </div>
+          <span className="text-xs sm:text-sm text-ink-muted text-left">
+            Bergabung bareng mitra Sejasa lainnya
+          </span>
+        </div>
       </section>
 
       {/* Benefits */}
