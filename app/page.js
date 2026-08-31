@@ -11,7 +11,7 @@ import {
   GraduationCap,
   Sparkles,
   ArrowRight,
-  Hand,
+  Flower2,
   SprayCan,
 } from "lucide-react";
 import Logo from "@/components/Logo";
@@ -241,10 +241,11 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="card overflow-hidden hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
               <CategoryVisual
-                icon={Hand}
+                icon={Flower2}
                 from="#F0169B"
                 to="#A80057"
                 aspect="aspect-[16/9]"
+                rotate={-6}
               />
               <div className="p-4 sm:p-5">
                 <span
@@ -264,6 +265,7 @@ export default function HomePage() {
                 from="#7C3AED"
                 to="#5B21B6"
                 aspect="aspect-[16/9]"
+                rotate={6}
               />
               <div className="p-4 sm:p-5">
                 <span

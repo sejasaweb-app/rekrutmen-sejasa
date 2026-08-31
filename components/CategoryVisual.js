@@ -10,7 +10,7 @@ const DOT_PATTERN = {
  * gradient brand, tekstur dot tipis, dan blob blur di belakang biar berlapis
  * (bukan cuma icon polos di kotak warna).
  */
-export default function CategoryVisual({ icon: Icon, from, to, aspect }) {
+export default function CategoryVisual({ icon: Icon, from, to, aspect, rotate = 0 }) {
   return (
     <div
       className={`relative w-full ${aspect} overflow-hidden flex items-center justify-center`}
@@ -26,17 +26,22 @@ export default function CategoryVisual({ icon: Icon, from, to, aspect }) {
         style={{ background: to, bottom: "-16%", right: "-6%" }}
       />
 
-      <div className="relative">
+      <div className="relative" style={{ transform: `rotate(${rotate}deg)` }}>
         <div
-          className="w-24 h-24 sm:w-28 sm:h-28 rounded-[28px] flex items-center justify-center"
+          className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-[28px] flex items-center justify-center overflow-hidden"
           style={{
             background: `linear-gradient(135deg, ${from}, ${to})`,
             boxShadow: `0 18px 32px -14px ${from}70`,
           }}
         >
-          <Icon size={44} className="text-white" strokeWidth={1.6} />
+          {/* Sheen tipis biar badge kerasa punya dimensi, bukan warna flat */}
+          <div className="absolute inset-0 bg-gradient-to-br from-white/25 via-transparent to-black/10" />
+          <Icon size={44} className="relative text-white" strokeWidth={1.6} />
         </div>
-        <div className="absolute -top-2.5 -right-2.5 w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-md ring-1 ring-black/5">
+        <div
+          className="absolute -top-2.5 -right-2.5 w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-md ring-1 ring-black/5"
+          style={{ transform: `rotate(${-rotate}deg)` }}
+        >
           <Sparkles size={16} style={{ color: from }} />
         </div>
       </div>
