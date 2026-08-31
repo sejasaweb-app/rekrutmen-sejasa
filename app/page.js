@@ -81,16 +81,17 @@ export default function HomePage() {
     <main className="min-h-screen overflow-x-hidden">
       {/* Nav bar */}
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <Logo size={28} rounded="rounded-lg" />
-            <span className="font-display font-bold text-sm hidden sm:inline">Dispatcher Sejasa</span>
+            <Logo size={36} rounded="rounded-xl" />
+            <span className="font-display font-bold text-[15px] sm:text-lg tracking-tight">Dispatcher Sejasa</span>
           </div>
           <Link
             href="/apply"
-            className="text-sm font-medium bg-brand hover:bg-brand-dark text-white rounded-full px-4 sm:px-5 py-1.5 sm:py-2 transition"
+            className="group inline-flex items-center gap-1.5 text-sm font-semibold bg-brand hover:bg-brand-dark text-white rounded-full pl-4 sm:pl-5 pr-3.5 sm:pr-4 py-2 sm:py-2.5 shadow-md shadow-brand/25 hover:shadow-lg hover:shadow-brand/35 transition-all hover:scale-[1.03] active:scale-[0.98]"
           >
             Daftar
+            <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
       </header>
@@ -108,14 +109,7 @@ export default function HomePage() {
         <div className="absolute top-10 -left-24 w-72 h-72 rounded-full bg-brand/10 blur-3xl -z-10" />
         <div className="absolute top-32 -right-20 w-72 h-72 rounded-full bg-purple-400/10 blur-3xl -z-10" />
 
-        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand bg-white shadow-sm rounded-full px-3.5 py-1.5 mb-5 sm:mb-6">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-60" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-brand" />
-          </span>
-          Buka Pendaftaran Mitra
-        </span>
-        <h1 className="font-display font-extrabold text-[2.1rem] leading-[1.1] sm:text-6xl sm:leading-[1.05] mb-4 sm:mb-5 max-w-2xl mx-auto tracking-tight">
+        <h1 className="font-display font-extrabold text-[2.1rem] leading-[1.1] sm:text-6xl sm:leading-[1.05] mb-4 sm:mb-5 max-w-2xl mx-auto tracking-tight pt-2 sm:pt-4">
           Jadi Mitra <span className="text-brand">Dispatcher</span> Sejasa
         </h1>
         <p className="text-ink-muted text-base sm:text-lg max-w-lg mx-auto mb-7 sm:mb-9">
@@ -155,7 +149,7 @@ export default function HomePage() {
             </div>
             <span className="text-sm sm:text-base text-ink-muted text-left leading-snug">
               <span className="font-extrabold text-brand text-base sm:text-xl">2.500+</span>{" "}
-              pekerjaan diselesaikan mitra Dispatcher Sejasa
+              Pekerjaan sudah diselesaikan oleh Mitra Dispatcher Sejasa
             </span>
           </div>
         </div>
