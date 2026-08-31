@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseClient";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 const PROGRESS_STAGES = ["data_baru", "screening", "onboarding"];
 
@@ -9,6 +11,12 @@ const PROGRESS_STAGES = ["data_baru", "screening", "onboarding"];
 // buat pencocokan "hari yang sama" — pakai UTC mentah bisa geser 1 hari.
 function localDateKey(date) {
   return new Date(date).toLocaleDateString("en-CA"); // en-CA formatnya persis YYYY-MM-DD
+}
+
+function end_of_day(date) {
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d;
 }
 
 export async function GET(request) {
@@ -57,18 +65,42 @@ export async function GET(request) {
     const approvedCount = applicants.filter((a) => a.status === "approved").length;
     const rejectedCount = applicants.filter((a) => a.status === "rejected").length;
 
-    // --- Tren pendaftaran harian ---
-    const trendDays = range === "all" ? 30 : Math.min(Number(range), 90);
-    const days = [];
-    for (let i = trendDays - 1; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      days.push(localDateKey(d));
+    // --- Tren pendaftaran ---
+    // Range pendek (7/14 hari) tetep per-hari biar detail. Range panjang (30/90/semua)
+    // dikelompokin per minggu, soalnya puluhan bar harian jadi terlalu padet dibaca.
+    const totalDays = range === "all" ? 90 : Math.min(Number(range), 90);
+    const useWeekly = totalDays > 21;
+
+    let trend;
+    if (useWeekly) {
+      const weekCount = Math.ceil(totalDays / 7);
+      const buckets = [];
+      for (let w = weekCount - 1; w >= 0; w--) {
+        const end = new Date();
+        end.setDate(end.getDate() - w * 7);
+        const start = new Date(end);
+        start.setDate(start.getDate() - 6);
+        buckets.push({ start, end, label: `${start.getDate()}/${start.getMonth() + 1}` });
+      }
+      trend = buckets.map((b) => ({
+        date: b.label,
+        count: applicants.filter((a) => {
+          const created = new Date(a.created_at);
+          return created >= new Date(b.start.toDateString()) && created <= end_of_day(b.end);
+        }).length,
+      }));
+    } else {
+      const days = [];
+      for (let i = totalDays - 1; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        days.push(localDateKey(d));
+      }
+      trend = days.map((date) => ({
+        date,
+        count: applicants.filter((a) => localDateKey(a.created_at) === date).length,
+      }));
     }
-    const trend = days.map((date) => ({
-      date,
-      count: applicants.filter((a) => localDateKey(a.created_at) === date).length,
-    }));
 
     // --- Rata-rata waktu sampai keputusan (approved/rejected) dalam hari ---
     const decisionDurations = [];
@@ -108,20 +140,28 @@ export async function GET(request) {
       followUpByChannel[log.channel] = (followUpByChannel[log.channel] || 0) + 1;
     }
 
-    return NextResponse.json({
-      range,
-      total: applicants.length,
-      funnelConversion,
-      approvedCount,
-      rejectedCount,
-      trend,
-      avgDaysToDecision,
-      decisionCount: decisionDurations.length,
-      topDomisili,
-      followUpTotal: logs.length,
-      followUpByResponse,
-      followUpByChannel,
-    });
+    return NextResponse.json(
+      {
+        range,
+        total: applicants.length,
+        funnelConversion,
+        approvedCount,
+        rejectedCount,
+        trend,
+        trendGranularity: useWeekly ? "weekly" : "daily",
+        avgDaysToDecision,
+        decisionCount: decisionDurations.length,
+        topDomisili,
+        followUpTotal: logs.length,
+        followUpByResponse,
+        followUpByChannel,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        },
+      }
+    );
   } catch (err) {
     console.error("Analytics error:", err);
     return NextResponse.json({ error: "Gagal ambil data analitik" }, { status: 500 });

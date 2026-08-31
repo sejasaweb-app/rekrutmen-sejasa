@@ -29,7 +29,7 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     setData(null);
-    fetch(`/api/dashboard/analytics?range=${range}`)
+    fetch(`/api/dashboard/analytics?range=${range}`, { cache: "no-store" })
       .then((r) => r.json())
       .then(setData);
   }, [range]);
@@ -53,7 +53,7 @@ export default function AnalyticsPage() {
     <div>
       <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold mb-1">Performa Rekrutmen</h1>
+          <h1 className="font-display font-bold text-2xl mb-1 tracking-tight">Performa Rekrutmen</h1>
           <p className="text-ink-muted">Analitik lengkap proses rekrutmen mitra Sejasa.</p>
         </div>
         <div className="flex gap-1.5 bg-gray-50 p-1 rounded-full">
@@ -103,8 +103,8 @@ export default function AnalyticsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Funnel conversion */}
-        <div className="card p-5">
-          <h2 className="text-sm font-semibold mb-4">Funnel Konversi</h2>
+        <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
+          <h2 className="font-display text-sm font-semibold mb-4">Funnel Konversi</h2>
           <p className="text-xs text-ink-muted mb-4">Jumlah pendaftar yang pernah mencapai tiap tahap.</p>
           <div className="space-y-4">
             {data.funnelConversion.map((stage, i) => {
@@ -147,10 +147,11 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Trend chart */}
-        <div className="card p-5">
-          <h2 className="text-sm font-semibold mb-1">Tren Pendaftaran</h2>
+        <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
+          <h2 className="font-display text-sm font-semibold mb-1">Tren Pendaftaran</h2>
           <p className="text-xs text-ink-muted mb-4">
-            {RANGE_OPTIONS.find((o) => o.value === range)?.label || "Periode ini"}.
+            {RANGE_OPTIONS.find((o) => o.value === range)?.label || "Periode ini"}
+            {data.trendGranularity === "weekly" ? " · per minggu" : " · per hari"}.
           </p>
           <div className="relative h-40">
             {maxTrend === 0 ? (
@@ -180,18 +181,26 @@ export default function AnalyticsPage() {
             )}
           </div>
           <div className="flex justify-between mt-2 text-[10px] text-ink-muted">
-            <span>{formatShortDate(data.trend[0]?.date)}</span>
-            <span>{formatShortDate(data.trend[data.trend.length - 1]?.date)}</span>
+            <span>
+              {data.trendGranularity === "weekly"
+                ? data.trend[0]?.date
+                : formatShortDate(data.trend[0]?.date)}
+            </span>
+            <span>
+              {data.trendGranularity === "weekly"
+                ? data.trend[data.trend.length - 1]?.date
+                : formatShortDate(data.trend[data.trend.length - 1]?.date)}
+            </span>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top domisili */}
-        <div className="card p-5">
+        <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
           <div className="flex items-center gap-2 mb-4">
             <MapPin size={16} className="text-ink-muted" />
-            <h2 className="text-sm font-semibold">Top Domisili</h2>
+            <h2 className="font-display text-sm font-semibold">Top Domisili</h2>
           </div>
           {data.topDomisili.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-6 text-center">
@@ -221,10 +230,10 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Follow-up breakdown */}
-        <div className="card p-5">
+        <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
           <div className="flex items-center gap-2 mb-4">
             <MessageCircle size={16} className="text-ink-muted" />
-            <h2 className="text-sm font-semibold">Hasil Follow-up</h2>
+            <h2 className="font-display text-sm font-semibold">Hasil Follow-up</h2>
           </div>
           {data.followUpTotal === 0 ? (
             <div className="flex flex-col items-center justify-center py-6 text-center">
@@ -259,7 +268,7 @@ function formatShortDate(dateStr) {
 
 function StatCard({ icon: Icon, label, value, sub, accent }) {
   return (
-    <div className="card p-5">
+    <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
       <div className="flex items-center justify-between mb-4">
         <div className="text-[11px] uppercase tracking-wide text-gray-400 font-medium">{label}</div>
         <div
