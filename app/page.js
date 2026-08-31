@@ -1,8 +1,8 @@
 import Link from "next/link";
 import {
-  Users,
-  Clock,
+  MapPin,
   Wallet,
+  Clock,
   ShieldCheck,
   Headphones,
   Zap,
@@ -22,25 +22,25 @@ import CategoryVisual from "@/components/CategoryVisual";
 // bukan random warna default Tailwind.
 const BENEFITS = [
   {
-    icon: Users,
-    title: "Pelanggan Langsung dari Sejasa",
-    desc: "Ga perlu cari pelanggan sendiri — kami yang salurkan orderan ke kamu.",
+    icon: MapPin,
+    title: "Job Sesuai Jangkauan Wilayah",
+    desc: "Orderan yang masuk disesuaikan sama radius wilayah kerja kamu, jadi lebih dekat dan efisien.",
     from: "#F0169B",
     to: "#A80057",
   },
   {
-    icon: Clock,
-    title: "Atur Jadwal Sendiri",
-    desc: "Kerja fleksibel, kamu yang tentukan kapan mau aktif terima orderan.",
-    from: "#7C3AED",
-    to: "#5B21B6",
-  },
-  {
     icon: Wallet,
-    title: "Penghasilan Tambahan",
-    desc: "Potensi income harian dari tiap orderan yang kamu selesaikan.",
+    title: "Penghasilan Terjamin",
+    desc: "Dapetin penghasilan yang jelas dari tiap orderan yang kamu selesaikan, tanpa perlu nyari pelanggan sendiri.",
     from: "#F59E0B",
     to: "#B45309",
+  },
+  {
+    icon: Clock,
+    title: "Jadwal Kerja Terstruktur",
+    desc: "Jadwal diatur lewat sistem sesuai ketersediaan & kebutuhan area, biar adil dan teratur buat semua mitra.",
+    from: "#7C3AED",
+    to: "#5B21B6",
   },
   {
     icon: ShieldCheck,
@@ -51,8 +51,8 @@ const BENEFITS = [
   },
   {
     icon: Headphones,
-    title: "Didukung Tim Sejasa",
-    desc: "Ada tim yang siap bantu kalau kamu butuh dukungan di lapangan.",
+    title: "Dibantu Tim Khusus Sejasa",
+    desc: "Ada Tim Khusus Sejasa Official yang siap bantu langsung kalau kamu butuh dukungan di lapangan.",
     from: "#7C3AED",
     to: "#5B21B6",
   },
@@ -121,8 +121,8 @@ export default function HomePage() {
           Jadi Mitra <span className="text-brand">Dispatcher</span> Sejasa
         </h1>
         <p className="text-ink-muted text-base sm:text-lg max-w-lg mx-auto mb-7 sm:mb-9">
-          Dapatkan pelanggan Massage & Daily Cleaning langsung dari Sejasa.
-          Atur jadwal sendiri, mulai dari sekarang.
+          Dapatkan pelanggan Massage & Daily Cleaning sesuai jangkauan wilayah kamu.
+          Penghasilan terjamin, didukung langsung oleh Tim Sejasa.
         </p>
         <Link
           href="/apply"
@@ -148,7 +148,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-7 sm:mb-12">
             <h2 className="font-display font-bold text-2xl sm:text-3xl mb-2 sm:mb-3 tracking-tight">Kenapa Gabung Jadi Mitra?</h2>
-            <p className="text-ink-muted text-sm sm:text-base max-w-md mx-auto">
+            <p className="text-ink-muted text-[15px] sm:text-base max-w-md mx-auto">
               Beberapa keuntungan yang kamu dapat sebagai mitra Dispatcher Sejasa.
             </p>
           </div>
@@ -168,7 +168,7 @@ export default function HomePage() {
                     <Icon size={22} className="text-white hidden sm:block" />
                   </div>
                   <h3 className="font-display font-semibold text-sm sm:text-base mb-1 sm:mb-1.5 leading-snug">{b.title}</h3>
-                  <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">{b.desc}</p>
+                  <p className="text-[13px] sm:text-sm text-ink-muted leading-relaxed">{b.desc}</p>
                 </div>
               );
             })}
@@ -181,7 +181,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8 sm:mb-14">
             <h2 className="font-display font-bold text-2xl sm:text-3xl mb-2 sm:mb-3 tracking-tight">Cara Bergabung</h2>
-            <p className="text-ink-muted text-sm sm:text-base">4 langkah gampang buat mulai jadi mitra.</p>
+            <p className="text-ink-muted text-[15px] sm:text-base">4 langkah gampang buat mulai jadi mitra.</p>
           </div>
           <div className="relative grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-8 sm:gap-6">
             <div
@@ -204,8 +204,8 @@ export default function HomePage() {
                       {i + 1}
                     </span>
                   </div>
-                  <h3 className="font-display font-semibold text-xs sm:text-sm mb-1 sm:mb-1.5">{s.title}</h3>
-                  <p className="text-[11px] sm:text-xs text-ink-muted leading-relaxed">{s.desc}</p>
+                  <h3 className="font-display font-semibold text-sm sm:text-base mb-1 sm:mb-1.5">{s.title}</h3>
+                  <p className="text-xs sm:text-sm text-ink-muted leading-relaxed">{s.desc}</p>
                 </div>
               );
             })}
@@ -218,7 +218,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-7 sm:mb-12">
             <h2 className="font-display font-bold text-2xl sm:text-3xl mb-2 sm:mb-3 tracking-tight">Kategori Layanan</h2>
-            <p className="text-ink-muted text-sm sm:text-base">Pilih kategori yang paling sesuai sama skill kamu.</p>
+            <p className="text-ink-muted text-[15px] sm:text-base">Pilih kategori yang paling sesuai sama skill kamu.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="card overflow-hidden hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
@@ -268,7 +268,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-7 sm:mb-12">
             <h2 className="font-display font-bold text-2xl sm:text-3xl mb-2 sm:mb-3 tracking-tight">Komunitas Mitra Sejasa</h2>
-            <p className="text-ink-muted text-sm sm:text-base max-w-md mx-auto">
+            <p className="text-ink-muted text-[15px] sm:text-base max-w-md mx-auto">
               Kamu ga sendirian — jadi bagian dari komunitas mitra yang saling
               support satu sama lain.
             </p>
@@ -312,7 +312,7 @@ export default function HomePage() {
         <h2 className="font-display font-bold text-2xl sm:text-3xl mb-2.5 sm:mb-3 text-white tracking-tight">
           Siap Gabung Jadi Mitra?
         </h2>
-        <p className="text-white/80 text-sm sm:text-base max-w-md mx-auto mb-7 sm:mb-9">
+        <p className="text-white/80 text-[15px] sm:text-base max-w-md mx-auto mb-7 sm:mb-9">
           Daftar sekarang, tim kami bakal hubungi kamu lewat WhatsApp atau telepon
           setelah lamaran kamu ditinjau.
         </p>
