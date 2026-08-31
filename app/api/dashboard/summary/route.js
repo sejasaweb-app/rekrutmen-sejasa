@@ -4,6 +4,8 @@ import { supabaseAdmin } from "@/lib/supabaseClient";
 // Route ini ga baca apapun dari request, jadi Next.js defaultnya nge-cache
 // hasilnya sebagai halaman statis. Paksa selalu fresh biar angka ga telat update.
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 // Rekapan buat admin dashboard: total per status & per kategori
 export async function GET() {
@@ -20,11 +22,18 @@ export async function GET() {
       byKategori[row.kategori] = (byKategori[row.kategori] || 0) + 1;
     }
 
-    return NextResponse.json({
-      total: data.length,
-      byStatus,
-      byKategori,
-    });
+    return NextResponse.json(
+      {
+        total: data.length,
+        byStatus,
+        byKategori,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+        },
+      }
+    );
   } catch (err) {
     console.error("Summary error:", err);
     return NextResponse.json({ error: "Gagal ambil rekapan" }, { status: 500 });

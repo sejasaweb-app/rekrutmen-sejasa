@@ -69,8 +69,8 @@ export default function AdminDashboardPage() {
     if (q) params.set("q", q);
 
     const [summaryRes, listRes] = await Promise.all([
-      fetch("/api/dashboard/summary"),
-      fetch(`/api/applicants?${params.toString()}`),
+      fetch("/api/dashboard/summary", { cache: "no-store" }),
+      fetch(`/api/applicants?${params.toString()}`, { cache: "no-store" }),
     ]);
     const summaryData = await summaryRes.json();
     const listData = await listRes.json();
