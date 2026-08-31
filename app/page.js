@@ -126,13 +126,13 @@ export default function HomePage() {
         </p>
         <Link
           href="/apply"
-          className="group inline-flex items-center gap-2 bg-brand hover:bg-brand-dark text-white font-semibold rounded-full px-6 sm:px-7 py-3 sm:py-3.5 transition shadow-xl shadow-brand/25"
+          className="group inline-flex items-center gap-2.5 bg-brand hover:bg-brand-dark text-white font-bold text-base sm:text-lg rounded-full px-8 sm:px-10 py-4 sm:py-5 transition shadow-2xl shadow-brand/40 hover:scale-[1.03] active:scale-[0.98]"
         >
           Daftar Jadi Mitra
-          <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
+          <ArrowRight size={20} className="group-hover:translate-x-0.5 transition-transform" />
         </Link>
 
-        {/* Social proof ringan — preview foto mitra asli, bukan angka klaim */}
+        {/* Social proof — angka riil pekerjaan yang udah diselesaikan mitra */}
         <div className="flex items-center justify-center gap-3 mt-8 sm:mt-10">
           <div className="flex -space-x-3">
             {["1", "2", "3"].map((n) => (
@@ -152,7 +152,8 @@ export default function HomePage() {
             ))}
           </div>
           <span className="text-xs sm:text-sm text-ink-muted text-left">
-            Bergabung bareng mitra Sejasa lainnya
+            <span className="font-bold text-ink">2.500+</span> pekerjaan udah
+            diselesaikan mitra Dispatcher Sejasa
           </span>
         </div>
       </section>
@@ -332,10 +333,10 @@ export default function HomePage() {
         </p>
         <Link
           href="/apply"
-          className="group inline-flex items-center gap-2 bg-white text-brand font-semibold rounded-full px-6 sm:px-7 py-3 sm:py-3.5 transition hover:bg-gray-50 shadow-xl"
+          className="group inline-flex items-center gap-2.5 bg-white text-brand font-bold text-base sm:text-lg rounded-full px-8 sm:px-10 py-4 sm:py-5 transition shadow-2xl hover:bg-gray-50 hover:scale-[1.03] active:scale-[0.98]"
         >
           Daftar Jadi Mitra
-          <ArrowRight size={18} className="group-hover:translate-x-0.5 transition-transform" />
+          <ArrowRight size={20} className="group-hover:translate-x-0.5 transition-transform" />
         </Link>
       </section>
     </main>
