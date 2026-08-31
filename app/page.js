@@ -247,14 +247,14 @@ export default function HomePage() {
                 to="#A80057"
                 aspect="aspect-[4/3]"
               />
-              <div className="p-4 sm:p-5">
+              <div className="p-5 sm:p-6 border-t border-black/[0.04]">
                 <span
-                  className="text-xs font-semibold text-white rounded-full px-2.5 py-1"
+                  className="text-sm sm:text-base font-bold text-white rounded-full px-3.5 py-1.5 shadow-sm"
                   style={{ background: "linear-gradient(135deg, #F0169B, #A80057)" }}
                 >
                   Massage
                 </span>
-                <p className="text-sm text-ink-muted mt-2.5 sm:mt-3">
+                <p className="text-[15px] sm:text-base text-ink-muted mt-3 sm:mt-3.5 leading-relaxed">
                   Layani pelanggan yang butuh jasa pijat profesional di rumah mereka.
                 </p>
               </div>
@@ -267,14 +267,14 @@ export default function HomePage() {
                 to="#5B21B6"
                 aspect="aspect-[4/3]"
               />
-              <div className="p-4 sm:p-5">
+              <div className="p-5 sm:p-6 border-t border-black/[0.04]">
                 <span
-                  className="text-xs font-semibold text-white rounded-full px-2.5 py-1"
+                  className="text-sm sm:text-base font-bold text-white rounded-full px-3.5 py-1.5 shadow-sm"
                   style={{ background: "linear-gradient(135deg, #7C3AED, #5B21B6)" }}
                 >
                   Daily Cleaning
                 </span>
-                <p className="text-sm text-ink-muted mt-2.5 sm:mt-3">
+                <p className="text-[15px] sm:text-base text-ink-muted mt-3 sm:mt-3.5 leading-relaxed">
                   Bantu pelanggan bersihkan rumah mereka secara rutin maupun sekali datang.
                 </p>
               </div>

@@ -25,7 +25,7 @@ export default function CategoryIllustration({ src, alt, from, to, aspect }) {
         className="absolute w-32 h-32 rounded-full blur-3xl opacity-20"
         style={{ background: to, bottom: "-12%", right: "-4%" }}
       />
-      <div className="absolute inset-x-0 bottom-0 h-[78%] sm:h-[82%]">
+      <div className="absolute inset-x-0 bottom-0 h-[88%] sm:h-[90%]">
         <Image
           src={src}
           alt={alt}
