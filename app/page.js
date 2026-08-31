@@ -124,13 +124,16 @@ export default function HomePage() {
           Dapatkan pelanggan Massage & Daily Cleaning sesuai jangkauan wilayah kamu.
           Penghasilan terjamin, didukung langsung oleh Tim Sejasa.
         </p>
-        <Link
-          href="/apply"
-          className="group inline-flex items-center gap-2.5 bg-brand hover:bg-brand-dark text-white font-bold text-base sm:text-lg rounded-full px-8 sm:px-10 py-4 sm:py-5 transition shadow-2xl shadow-brand/40 hover:scale-[1.03] active:scale-[0.98]"
-        >
-          Daftar Jadi Mitra
-          <ArrowRight size={20} className="group-hover:translate-x-0.5 transition-transform" />
-        </Link>
+        <div className="relative inline-block">
+          <span className="absolute inset-0 rounded-full bg-brand opacity-50 blur-2xl animate-pulse scale-110 -z-10" />
+          <Link
+            href="/apply"
+            className="group relative inline-flex items-center gap-2.5 bg-brand hover:bg-brand-dark text-white font-bold text-lg sm:text-xl rounded-full px-10 sm:px-12 py-5 sm:py-6 transition shadow-2xl shadow-brand/50 hover:scale-[1.04] active:scale-[0.98]"
+          >
+            Daftar Jadi Mitra
+            <ArrowRight size={22} className="group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+        </div>
 
         {/* Social proof — angka riil pekerjaan yang udah diselesaikan mitra */}
         <div className="flex items-center justify-center gap-3 mt-8 sm:mt-10">
