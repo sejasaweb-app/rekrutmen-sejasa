@@ -136,8 +136,8 @@ export default function HomePage() {
         </div>
 
         {/* Social proof — angka riil pekerjaan yang udah diselesaikan mitra */}
-        <div className="flex justify-center mt-8 sm:mt-10">
-          <div className="inline-flex items-center gap-3 sm:gap-4 bg-white rounded-full pl-2 pr-5 sm:pl-2.5 sm:pr-6 py-2 sm:py-2.5 shadow-lg shadow-black/[0.06] ring-1 ring-black/[0.04]">
+        <div className="flex justify-center mt-10 sm:mt-14">
+          <div className="inline-flex items-center gap-3 sm:gap-4">
             <div className="flex -space-x-3 shrink-0">
               {["1", "2", "3"].map((n) => (
                 <div
