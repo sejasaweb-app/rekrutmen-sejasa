@@ -155,7 +155,7 @@ export default function SettingsPage() {
       </div>
 
       <button onClick={save} disabled={saving} className="btn-primary text-sm px-6 py-2.5">
-        {saving ? "Menyimpan..." : "Simpan Settingan"}
+        {saving ? "Menyimpan..." : "Simpan"}
       </button>
     </div>
   );
