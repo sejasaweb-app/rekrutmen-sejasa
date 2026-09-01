@@ -21,7 +21,7 @@ import {
   X,
   Bike,
 } from "lucide-react";
-import { STATUS_META } from "@/components/StatusBadge";
+import StatusBadge, { STATUS_META } from "@/components/StatusBadge";
 
 // Ubah nomor telepon Indonesia (format apapun) jadi link wa.me yang valid
 function toWhatsAppLink(phone) {
@@ -174,24 +174,6 @@ function AdminDashboardContent() {
       toast.error("Gagal menghapus data, coba lagi ya");
     } finally {
       setDeletingId(null);
-    }
-  }
-
-  async function handleStatusChange(id, newStatus) {
-    const snapshot = applicants;
-    setApplicants((prev) => prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a)));
-    try {
-      const res = await fetch(`/api/applicants/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      });
-      if (!res.ok) throw new Error();
-      toast.success(`Status diubah ke "${STATUS_META[newStatus]?.label || newStatus}"`);
-      refreshSummary();
-    } catch {
-      setApplicants(snapshot);
-      toast.error("Gagal update status, coba lagi ya");
     }
   }
 
@@ -423,13 +405,7 @@ function AdminDashboardContent() {
                           <span className="text-xs text-ink-muted">Tidak</span>
                         )}
                       </td>
-                      <td className="px-4 py-3">
-                        <StatusSelect
-                          applicantId={a.id}
-                          status={a.status}
-                          onChange={(newStatus) => handleStatusChange(a.id, newStatus)}
-                        />
-                      </td>
+                      <td className="px-4 py-3"><StatusBadge status={a.status} /></td>
                       <td className="px-4 py-3 text-ink-muted">
                         {new Date(a.created_at).toLocaleDateString("id-ID")}
                       </td>
@@ -533,40 +509,6 @@ function SortableHeader({ label, field, sortBy, sortDir, onSort }) {
         )}
       </button>
     </th>
-  );
-}
-
-function StatusSelect({ applicantId, status, onChange }) {
-  const [updating, setUpdating] = useState(false);
-  const meta = STATUS_META[status];
-
-  async function handleSelect(e) {
-    const newStatus = e.target.value;
-    if (newStatus === status) return;
-    setUpdating(true);
-    await onChange(newStatus);
-    setUpdating(false);
-  }
-
-  return (
-    <div className={`relative inline-flex items-center ${updating ? "opacity-60" : ""}`}>
-      <select
-        value={status}
-        onChange={handleSelect}
-        disabled={updating}
-        title="Ganti status"
-        className={`badge gap-1 appearance-none pr-6 cursor-pointer border-0 focus:outline-none focus:ring-2 focus:ring-brand/30 transition ${
-          meta?.classes || "bg-gray-100 text-gray-600"
-        }`}
-      >
-        {STATUS_OPTIONS.filter((o) => o.value).map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-      <ChevronDown size={11} className="pointer-events-none absolute right-1.5 opacity-60" />
-    </div>
   );
 }
 
