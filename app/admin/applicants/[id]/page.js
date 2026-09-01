@@ -47,6 +47,8 @@ export default function ApplicantDetailPage() {
   const router = useRouter();
   const [applicant, setApplicant] = useState(null);
   const [catatan, setCatatan] = useState("");
+  const [alasanPenolakan, setAlasanPenolakan] = useState("");
+  const [savingAlasan, setSavingAlasan] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const [logs, setLogs] = useState([]);
@@ -61,6 +63,7 @@ export default function ApplicantDetailPage() {
     const data = await res.json();
     setApplicant(data.applicant);
     setCatatan(data.applicant?.catatan_admin || "");
+    setAlasanPenolakan(data.applicant?.alasan_penolakan || "");
   }
 
   async function loadLogs() {
@@ -79,10 +82,15 @@ export default function ApplicantDetailPage() {
 
   async function updateStatus(newStatus) {
     setSaving(true);
+    const body = { status: newStatus };
+    // Kalau lagi ubah ke Ditolak, sertakan alasan yang udah diisi admin (kalau ada)
+    // biar langsung kepakai di pesan WA penolakan tanpa perlu simpan manual dulu.
+    if (newStatus === "rejected") body.alasan_penolakan = alasanPenolakan;
+
     const res = await fetch(`/api/applicants/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: newStatus }),
+      body: JSON.stringify(body),
     });
     const data = await res.json();
     setSaving(false);
@@ -92,6 +100,23 @@ export default function ApplicantDetailPage() {
     }
     toast.success(`Status diubah ke ${STATUS_LABELS[newStatus]}`);
     loadApplicant();
+  }
+
+  // Simpan alasan penolakan tanpa ubah status — buat kasus admin mau edit
+  // alasan setelah status udah Ditolak (nggak trigger kirim ulang WA).
+  async function saveAlasan() {
+    setSavingAlasan(true);
+    const res = await fetch(`/api/applicants/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ alasan_penolakan: alasanPenolakan }),
+    });
+    setSavingAlasan(false);
+    if (!res.ok) {
+      toast.error("Gagal simpan alasan");
+      return;
+    }
+    toast.success("Alasan tersimpan");
   }
 
   async function saveCatatan() {
@@ -267,6 +292,27 @@ export default function ApplicantDetailPage() {
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-sm font-medium mb-2">Alasan Penolakan (opsional)</label>
+          <p className="text-xs text-ink-muted mb-2">
+            Diisi sebelum klik status Ditolak — otomatis disertakan di pesan WA ke pelamar.
+            Beda dari Catatan Internal di bawah (yang nggak pernah dikirim ke pelamar).
+          </p>
+          <textarea
+            className="input-field min-h-[80px]"
+            value={alasanPenolakan}
+            onChange={(e) => setAlasanPenolakan(e.target.value)}
+            placeholder="Misal: Domisili di luar area jangkauan saat ini."
+          />
+          <button
+            onClick={saveAlasan}
+            disabled={savingAlasan}
+            className="btn-primary mt-3 text-sm px-5 py-2"
+          >
+            {savingAlasan ? "Menyimpan..." : "Simpan Alasan"}
+          </button>
         </div>
 
         <div>

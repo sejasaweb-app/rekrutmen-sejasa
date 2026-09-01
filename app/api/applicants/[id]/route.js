@@ -24,10 +24,17 @@ async function maybeSendStatusNotification(supabase, applicant, newStatus) {
     const template =
       newStatus === "approved" ? settings.wa_message_approved : settings.wa_message_rejected;
 
+    // {catatan_penolakan} — blok siap-pakai, cuma muncul kalau alasan diisi admin,
+    // biar admin ga perlu mikirin format kosong/ganjil kalau alasan dikosongin.
+    const alasan = applicant.alasan_penolakan || "";
+    const catatanPenolakan = alasan ? `\n\nCatatan dari tim: ${alasan}` : "";
+
     const message = renderTemplate(template, {
       nama: applicant.nama,
       kategori: KATEGORI_LABELS[applicant.kategori] || applicant.kategori,
       domisili: applicant.domisili,
+      alasan,
+      catatan_penolakan: catatanPenolakan,
     });
 
     const result = await sendWhatsAppNotification({ phone: applicant.no_telp, message });
@@ -56,11 +63,12 @@ export async function GET(request, { params }) {
 export async function PATCH(request, { params }) {
   try {
     const body = await request.json();
-    const { status, catatan_admin } = body;
+    const { status, catatan_admin, alasan_penolakan } = body;
 
     const updatePayload = {};
     if (status) updatePayload.status = status;
     if (catatan_admin !== undefined) updatePayload.catatan_admin = catatan_admin;
+    if (alasan_penolakan !== undefined) updatePayload.alasan_penolakan = alasan_penolakan;
 
     const supabase = supabaseAdmin();
     const { data: before } = await supabase

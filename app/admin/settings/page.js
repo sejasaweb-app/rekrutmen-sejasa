@@ -8,6 +8,10 @@ const PLACEHOLDER_HINTS = [
   { key: "{nama}", desc: "Nama pelamar" },
   { key: "{kategori}", desc: "Kategori lamaran (Massage Therapist / Daily Cleaning)" },
   { key: "{domisili}", desc: "Domisili pelamar" },
+  {
+    key: "{catatan_penolakan}",
+    desc: "Khusus pesan Ditolak — otomatis jadi kalimat \"Catatan dari tim: ...\" kalau admin isi Alasan Penolakan, atau kosong kalau tidak diisi",
+  },
 ];
 
 export default function SettingsPage() {
