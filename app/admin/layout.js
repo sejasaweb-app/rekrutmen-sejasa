@@ -10,7 +10,7 @@ import Logo from "@/components/Logo";
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/analytics", label: "Performa", icon: BarChart3 },
-  { href: "/admin/settings", label: "Settingan", icon: Settings },
+  { href: "/admin/settings", label: "Pengaturan", icon: Settings },
 ];
 
 export default function AdminLayout({ children }) {

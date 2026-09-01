@@ -67,7 +67,7 @@ export default function SettingsPage() {
   return (
     <div className="max-w-2xl">
       <Toaster position="top-center" />
-      <h1 className="text-xl font-bold mb-1">Settingan</h1>
+      <h1 className="text-xl font-bold mb-1">Pengaturan</h1>
       <p className="text-ink-muted text-sm mb-6">
         Atur notifikasi WhatsApp otomatis ke pelamar saat status diubah.
       </p>
