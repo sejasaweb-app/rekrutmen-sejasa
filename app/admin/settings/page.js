@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { MessageCircle, CheckCircle2, XCircle, Info } from "lucide-react";
+import { MessageCircle, CheckCircle2, XCircle, Info, Gauge, AlertTriangle } from "lucide-react";
 
 const PLACEHOLDER_HINTS = [
   { key: "{nama}", desc: "Nama pelamar" },
@@ -20,6 +20,8 @@ export default function SettingsPage() {
   const [enabled, setEnabled] = useState(false);
   const [msgApproved, setMsgApproved] = useState("");
   const [msgRejected, setMsgRejected] = useState("");
+  const [monthlyLimit, setMonthlyLimit] = useState(1000);
+  const [waUsage, setWaUsage] = useState({ count: 0, monthLabel: "" });
 
   async function load() {
     setLoading(true);
@@ -29,6 +31,8 @@ export default function SettingsPage() {
       setEnabled(!!data.settings.wa_notif_enabled);
       setMsgApproved(data.settings.wa_message_approved || "");
       setMsgRejected(data.settings.wa_message_rejected || "");
+      setMonthlyLimit(data.settings.wa_monthly_limit || 1000);
+      if (data.waUsage) setWaUsage(data.waUsage);
     } else {
       toast.error(data.error || "Gagal ambil settingan");
     }
@@ -48,6 +52,7 @@ export default function SettingsPage() {
         wa_notif_enabled: enabled,
         wa_message_approved: msgApproved,
         wa_message_rejected: msgRejected,
+        wa_monthly_limit: Number(monthlyLimit) || 1000,
       }),
     });
     const data = await res.json();
@@ -56,6 +61,7 @@ export default function SettingsPage() {
       toast.error(data.error || "Gagal simpan settingan");
       return;
     }
+    if (data.waUsage) setWaUsage(data.waUsage);
     toast.success("Settingan tersimpan");
   }
 
@@ -105,6 +111,78 @@ export default function SettingsPage() {
             />
           </button>
         </div>
+      </div>
+
+      <div className="card p-6 mb-6">
+        <div className="flex items-center gap-2.5 mb-4">
+          <div className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <Gauge size={17} />
+          </div>
+          <div>
+            <p className="font-semibold text-sm">Pemakaian WA Bulan Ini</p>
+            <p className="text-xs text-ink-muted">
+              {waUsage.monthLabel ? `Periode ${waUsage.monthLabel}` : "Dihitung dari WA yang berhasil terkirim"}
+            </p>
+          </div>
+        </div>
+
+        {(() => {
+          const pct = monthlyLimit > 0 ? Math.min(100, Math.round((waUsage.count / monthlyLimit) * 100)) : 0;
+          const isNearLimit = pct >= 90;
+          const isOverLimit = waUsage.count >= monthlyLimit;
+          return (
+            <>
+              <div className="flex items-end justify-between mb-1.5">
+                <span className="text-2xl font-bold">
+                  {waUsage.count}
+                  <span className="text-sm font-normal text-ink-muted"> / {monthlyLimit}</span>
+                </span>
+                <span
+                  className={`text-xs font-medium ${
+                    isOverLimit ? "text-red-600" : isNearLimit ? "text-amber-600" : "text-ink-muted"
+                  }`}
+                >
+                  {pct}%
+                </span>
+              </div>
+              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    isOverLimit ? "bg-red-500" : isNearLimit ? "bg-amber-500" : "bg-brand"
+                  }`}
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+
+              {isOverLimit && (
+                <div className="flex items-start gap-2 bg-red-50 text-red-700 text-xs rounded-lg p-3 mb-3">
+                  <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                  <span>
+                    Kuota bulan ini sudah habis — notifikasi WA otomatis berhenti terkirim sampai
+                    bulan depan. Naikkan limit di bawah kalau paket Fonnte kamu sudah di-upgrade.
+                  </span>
+                </div>
+              )}
+              {!isOverLimit && isNearLimit && (
+                <div className="flex items-start gap-2 bg-amber-50 text-amber-700 text-xs rounded-lg p-3 mb-3">
+                  <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                  <span>Kuota WA bulan ini hampir habis, siap-siap kalau mau upgrade paket Fonnte.</span>
+                </div>
+              )}
+            </>
+          );
+        })()}
+
+        <label className="block text-xs font-medium text-ink-muted mb-1.5">
+          Limit bulanan (sesuaikan kalau paket Fonnte berubah)
+        </label>
+        <input
+          type="number"
+          min={1}
+          className="input-field text-sm max-w-[160px]"
+          value={monthlyLimit}
+          onChange={(e) => setMonthlyLimit(e.target.value)}
+        />
       </div>
 
       <div className="card p-6 mb-6">

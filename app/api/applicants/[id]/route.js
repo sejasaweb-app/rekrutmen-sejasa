@@ -21,6 +21,31 @@ async function maybeSendStatusNotification(supabase, applicant, newStatus) {
 
     if (!settings?.wa_notif_enabled) return;
 
+    // Guard kuota: jangan kirim kalau pemakaian bulan ini udah nyentuh limit,
+    // biar ga kebablasan kena charge/limit dari Fonnte tanpa sadar.
+    const limit = settings.wa_monthly_limit || 1000;
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+
+    const { count: usedThisMonth } = await supabase
+      .from("wa_send_log")
+      .select("id", { count: "exact", head: true })
+      .eq("success", true)
+      .gte("created_at", startOfMonth.toISOString());
+
+    if ((usedThisMonth || 0) >= limit) {
+      console.error(`Kuota WA bulan ini sudah habis (${usedThisMonth}/${limit}), notifikasi tidak dikirim.`);
+      await supabase.from("wa_send_log").insert({
+        applicant_id: applicant.id,
+        status_target: newStatus,
+        phone: applicant.no_telp,
+        success: false,
+        error: `Kuota bulanan habis (${usedThisMonth}/${limit})`,
+      });
+      return;
+    }
+
     const template =
       newStatus === "approved" ? settings.wa_message_approved : settings.wa_message_rejected;
 
@@ -41,6 +66,15 @@ async function maybeSendStatusNotification(supabase, applicant, newStatus) {
     if (!result.success) {
       console.error("Gagal kirim notifikasi WA:", result.error);
     }
+
+    // Catat ke log — ini yang jadi basis hitungan counter pemakaian di halaman Pengaturan.
+    await supabase.from("wa_send_log").insert({
+      applicant_id: applicant.id,
+      status_target: newStatus,
+      phone: applicant.no_telp,
+      success: result.success,
+      error: result.success ? null : result.error,
+    });
   } catch (err) {
     console.error("Notifikasi WA error:", err);
   }
