@@ -46,9 +46,9 @@ export default function ApplicantDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   const [applicant, setApplicant] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
   const [catatan, setCatatan] = useState("");
   const [alasanPenolakan, setAlasanPenolakan] = useState("");
-  const [savingAlasan, setSavingAlasan] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const [logs, setLogs] = useState([]);
@@ -62,6 +62,7 @@ export default function ApplicantDetailPage() {
     const res = await fetch(`/api/applicants/${id}`);
     const data = await res.json();
     setApplicant(data.applicant);
+    setSelectedStatus(data.applicant?.status);
     setCatatan(data.applicant?.catatan_admin || "");
     setAlasanPenolakan(data.applicant?.alasan_penolakan || "");
   }
@@ -80,12 +81,18 @@ export default function ApplicantDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  async function updateStatus(newStatus) {
+  // Satu tombol buat proses semuanya sekaligus: simpan status + catatan + alasan
+  // penolakan (kalau ada), baru setelah itu WA terkirim (kalau status berubah ke
+  // Diterima/Ditolak). Biar ga bingung tombol mana yang beneran ngirim WA.
+  async function prosesPerubahan() {
+    if (!catatan.trim()) {
+      toast.error("Catatan Internal wajib diisi");
+      return;
+    }
+
     setSaving(true);
-    const body = { status: newStatus };
-    // Kalau lagi ubah ke Ditolak, sertakan alasan yang udah diisi admin (kalau ada)
-    // biar langsung kepakai di pesan WA penolakan tanpa perlu simpan manual dulu.
-    if (newStatus === "rejected") body.alasan_penolakan = alasanPenolakan;
+    const body = { status: selectedStatus, catatan_admin: catatan };
+    if (selectedStatus === "rejected") body.alasan_penolakan = alasanPenolakan;
 
     const res = await fetch(`/api/applicants/${id}`, {
       method: "PATCH",
@@ -95,43 +102,17 @@ export default function ApplicantDetailPage() {
     const data = await res.json();
     setSaving(false);
     if (!res.ok) {
-      toast.error(data.error || "Gagal update status");
+      toast.error(data.error || "Gagal memproses");
       return;
     }
-    toast.success(`Status diubah ke ${STATUS_LABELS[newStatus]}`);
+
+    const statusBerubah = selectedStatus !== applicant.status;
+    if (statusBerubah) {
+      toast.success(`Status diubah ke ${STATUS_LABELS[selectedStatus]}`);
+    } else {
+      toast.success("Perubahan tersimpan");
+    }
     loadApplicant();
-  }
-
-  // Simpan alasan penolakan tanpa ubah status — buat kasus admin mau edit
-  // alasan setelah status udah Ditolak (nggak trigger kirim ulang WA).
-  async function saveAlasan() {
-    setSavingAlasan(true);
-    const res = await fetch(`/api/applicants/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ alasan_penolakan: alasanPenolakan }),
-    });
-    setSavingAlasan(false);
-    if (!res.ok) {
-      toast.error("Gagal simpan alasan");
-      return;
-    }
-    toast.success("Alasan tersimpan");
-  }
-
-  async function saveCatatan() {
-    setSaving(true);
-    const res = await fetch(`/api/applicants/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ catatan_admin: catatan }),
-    });
-    setSaving(false);
-    if (!res.ok) {
-      toast.error("Gagal simpan catatan");
-      return;
-    }
-    toast.success("Catatan tersimpan");
   }
 
   async function addLog() {
@@ -280,10 +261,10 @@ export default function ApplicantDetailPage() {
             {STATUS_FLOW.map((s) => (
               <button
                 key={s}
-                disabled={saving || applicant.status === s}
-                onClick={() => updateStatus(s)}
+                type="button"
+                onClick={() => setSelectedStatus(s)}
                 className={`text-xs font-medium rounded-full px-4 py-2 border transition ${
-                  applicant.status === s
+                  selectedStatus === s
                     ? "bg-brand text-white border-brand"
                     : "border-gray-200 text-ink-muted hover:border-brand hover:text-brand"
                 }`}
@@ -294,39 +275,37 @@ export default function ApplicantDetailPage() {
           </div>
         </div>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium mb-2">Alasan Penolakan (opsional)</label>
-          <p className="text-xs text-ink-muted mb-2">
-            Diisi sebelum klik status Ditolak — otomatis disertakan di pesan WA ke pelamar.
-            Beda dari Catatan Internal di bawah (yang nggak pernah dikirim ke pelamar).
-          </p>
-          <textarea
-            className="input-field min-h-[80px]"
-            value={alasanPenolakan}
-            onChange={(e) => setAlasanPenolakan(e.target.value)}
-            placeholder="Misal: Domisili di luar area jangkauan saat ini."
-          />
-          <button
-            onClick={saveAlasan}
-            disabled={savingAlasan}
-            className="btn-primary mt-3 text-sm px-5 py-2"
-          >
-            {savingAlasan ? "Menyimpan..." : "Simpan Alasan"}
-          </button>
-        </div>
+        {selectedStatus === "rejected" && (
+          <div className="mb-6">
+            <label className="block text-sm font-medium mb-2">Alasan Penolakan (opsional)</label>
+            <p className="text-xs text-ink-muted mb-2">
+              Kalau diisi, otomatis disertakan di pesan WA penolakan ke pelamar. Beda dari
+              Catatan Internal di bawah (yang nggak pernah dikirim ke pelamar).
+            </p>
+            <textarea
+              className="input-field min-h-[80px]"
+              value={alasanPenolakan}
+              onChange={(e) => setAlasanPenolakan(e.target.value)}
+              placeholder="Misal: Domisili di luar area jangkauan saat ini."
+            />
+          </div>
+        )}
 
-        <div>
-          <label className="block text-sm font-medium mb-2">Catatan Internal</label>
+        <div className="mb-6">
+          <label className="block text-sm font-medium mb-2">
+            Catatan Internal <span className="text-red-500">*</span>
+          </label>
           <textarea
             className="input-field min-h-[100px]"
             value={catatan}
             onChange={(e) => setCatatan(e.target.value)}
-            placeholder="Catatan hasil interview, alasan reject, dsb."
+            placeholder="Catatan hasil interview, alasan reject, dsb. (wajib diisi)"
           />
-          <button onClick={saveCatatan} disabled={saving} className="btn-primary mt-3 text-sm px-5 py-2">
-            Simpan Catatan
-          </button>
         </div>
+
+        <button onClick={prosesPerubahan} disabled={saving} className="btn-primary text-sm px-6 py-2.5">
+          {saving ? "Memproses..." : "Proses"}
+        </button>
       </div>
 
       {/* Follow-up log — dicatat sebelum ubah status resmi */}
