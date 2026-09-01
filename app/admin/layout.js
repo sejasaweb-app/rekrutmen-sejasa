@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogOut, LayoutDashboard, BarChart3, ChevronRight } from "lucide-react";
+import { LogOut, LayoutDashboard, BarChart3, Settings, ChevronRight } from "lucide-react";
 import { supabasePublic } from "@/lib/supabaseClient";
 import Logo from "@/components/Logo";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/analytics", label: "Performa", icon: BarChart3 },
+  { href: "/admin/settings", label: "Settingan", icon: Settings },
 ];
 
 export default function AdminLayout({ children }) {

@@ -55,7 +55,25 @@ publik (form apply) dan sisi admin (dashboard + status tracking).
    GOOGLE_DRIVE_FOLDER_ID=...
    ```
 
-## 3. Jalankan lokal
+## 3. Setup Fonnte (notifikasi WhatsApp otomatis)
+
+1. Daftar/login ke [fonnte.com](https://fonnte.com), tambah device (scan QR pakai
+   nomor WA yang mau dipakai buat kirim notifikasi ke pelamar).
+2. Buka menu **Device**, copy **Token** device tersebut.
+3. Isi ke `.env.local` (dan nanti ke Environment Variables Vercel):
+   ```
+   FONNTE_TOKEN=...
+   ```
+4. Jalankan migration tambahan di **SQL Editor** Supabase: isi file
+   `supabase/migration_wa_notif.sql` (bikin tabel `app_settings`).
+5. Login ke `/admin/settings`, aktifkan toggle notifikasi dan sesuaikan isi
+   pesan buat status Diterima/Ditolak (bisa pakai placeholder `{nama}`,
+   `{kategori}`, `{domisili}`).
+
+Fitur ini aman dinonaktifkan kapan saja lewat toggle di halaman Settingan —
+kalau nonaktif, update status jalan seperti biasa tanpa kirim WA.
+
+## 4. Jalankan lokal
 
 ```bash
 cp .env.example .env.local
@@ -68,7 +86,7 @@ npm run dev
 - Form publik: `http://localhost:3000/apply`
 - Admin: `http://localhost:3000/admin/login`
 
-## 4. Deploy (gratis)
+## 5. Deploy (gratis)
 
 1. Push repo ini ke GitHub.
 2. Buka [vercel.com](https://vercel.com), import repo GitHub-nya.
@@ -87,16 +105,20 @@ app/
     layout.js                   auth guard + sidebar
     page.js                     dashboard (rekapan + list + filter)
     applicants/[id]/page.js     detail applicant + update status
+    settings/page.js             toggle & edit pesan notifikasi WA
   api/
     applicants/route.js          POST submit, GET list (+filter)
-    applicants/[id]/route.js     GET detail, PATCH update status/catatan
+    applicants/[id]/route.js     GET detail, PATCH update status/catatan (trigger WA notif)
+    settings/route.js            GET/PATCH settingan notifikasi WA
     upload/route.js              upload file ke Google Drive
     dashboard/summary/route.js   rekapan angka buat dashboard
 lib/
   supabaseClient.js            koneksi Supabase (public & admin)
   googleDrive.js                upload helper ke Google Drive
+  fonnte.js                     helper kirim WA via Fonnte
 supabase/
   schema.sql                    schema DB + trigger status_history
+  migration_wa_notif.sql        tabel app_settings buat fitur notifikasi WA
 ```
 
 ## Alur Status Applicant
@@ -109,7 +131,7 @@ tanpa kerja tambahan.
 
 ## Belum termasuk (next steps)
 
-- Notifikasi WA/email otomatis pas status berubah
+- Notifikasi email otomatis pas status berubah
 - Export data ke Excel/CSV
 - Role admin lebih dari satu level
 - Cek duplikat pendaftar (email/no telp yang sama)

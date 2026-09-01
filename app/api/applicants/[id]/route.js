@@ -1,7 +1,43 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseClient";
+import { sendWhatsAppNotification, renderTemplate } from "@/lib/fonnte";
 
 export const dynamic = "force-dynamic";
+
+const KATEGORI_LABELS = { massage: "Massage Therapist", daily_cleaning: "Daily Cleaning" };
+
+// Kirim notifikasi WA kalau status baru approved/rejected & fitur aktif di settings.
+// Sengaja "fire and forget" dengan try/catch sendiri — gagal kirim WA TIDAK BOLEH
+// menggagalkan update status pelamar yang sudah tersimpan di DB.
+async function maybeSendStatusNotification(supabase, applicant, newStatus) {
+  if (newStatus !== "approved" && newStatus !== "rejected") return;
+
+  try {
+    const { data: settings } = await supabase
+      .from("app_settings")
+      .select("*")
+      .eq("id", 1)
+      .single();
+
+    if (!settings?.wa_notif_enabled) return;
+
+    const template =
+      newStatus === "approved" ? settings.wa_message_approved : settings.wa_message_rejected;
+
+    const message = renderTemplate(template, {
+      nama: applicant.nama,
+      kategori: KATEGORI_LABELS[applicant.kategori] || applicant.kategori,
+      domisili: applicant.domisili,
+    });
+
+    const result = await sendWhatsAppNotification({ phone: applicant.no_telp, message });
+    if (!result.success) {
+      console.error("Gagal kirim notifikasi WA:", result.error);
+    }
+  } catch (err) {
+    console.error("Notifikasi WA error:", err);
+  }
+}
 
 
 export async function GET(request, { params }) {
@@ -27,6 +63,12 @@ export async function PATCH(request, { params }) {
     if (catatan_admin !== undefined) updatePayload.catatan_admin = catatan_admin;
 
     const supabase = supabaseAdmin();
+    const { data: before } = await supabase
+      .from("applicants")
+      .select("status")
+      .eq("id", params.id)
+      .single();
+
     const { data, error } = await supabase
       .from("applicants")
       .update(updatePayload)
@@ -35,6 +77,13 @@ export async function PATCH(request, { params }) {
       .single();
 
     if (error) throw error;
+
+    // Kirim notifikasi WA cuma kalau status BERUBAH ke approved/rejected
+    // (bukan cuma save catatan, dan bukan klik status yang sama lagi).
+    if (status && status !== before?.status) {
+      await maybeSendStatusNotification(supabase, data, status);
+    }
+
     return NextResponse.json({ applicant: data });
   } catch (err) {
     console.error("Update applicant error:", err);
