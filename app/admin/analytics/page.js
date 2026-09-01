@@ -30,7 +30,6 @@ const STAGE_COLORS = {
 const RANGE_OPTIONS = [
   { value: "today", label: "Hari ini" },
   { value: "7", label: "7 Hari" },
-  { value: "14", label: "14 Hari" },
   { value: "30", label: "30 Hari" },
   { value: "all", label: "Semua" },
   { value: "custom", label: "Custom" },
@@ -330,21 +329,11 @@ export default function AnalyticsPage() {
           <h2 className="font-display text-sm font-semibold mb-4">Funnel Konversi</h2>
           <p className="text-xs text-ink-muted mb-4">Jumlah pendaftar yang pernah mencapai tiap tahap.</p>
           <div className="space-y-3.5">
-            {data.funnelConversion.map((stage, i) => {
+            {data.funnelConversion.map((stage) => {
               const pctOfTotal = data.total > 0 ? Math.round((stage.count / data.total) * 100) : 0;
               const pct = data.total > 0 ? (stage.count / data.total) * 100 : 0;
-              const prevCount = i === 0 ? data.total : data.funnelConversion[i - 1].count;
-              const dropOffPct = prevCount > 0 ? Math.round(((prevCount - stage.count) / prevCount) * 100) : 0;
               return (
                 <div key={stage.stage}>
-                  {i > 0 && (
-                    <div className="flex items-center gap-2 pl-1 mb-1.5">
-                      <div className="w-px h-3 bg-gray-200" />
-                      {dropOffPct > 0 && (
-                        <span className="text-[10px] text-red-400 font-medium">-{dropOffPct}% drop-off</span>
-                      )}
-                    </div>
-                  )}
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-sm">{STAGE_LABELS[stage.stage]}</span>
                     <span className="text-sm font-semibold tabular-nums">
