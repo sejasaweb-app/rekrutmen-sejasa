@@ -6,6 +6,7 @@ export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
 const PROGRESS_STAGES = ["data_baru", "screening", "onboarding"];
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 // Format tanggal jadi YYYY-MM-DD di timezone lokal (bukan UTC), biar konsisten
 // buat pencocokan "hari yang sama" — pakai UTC mentah bisa geser 1 hari.
@@ -13,16 +14,103 @@ function localDateKey(date) {
   return new Date(date).toLocaleDateString("en-CA"); // en-CA formatnya persis YYYY-MM-DD
 }
 
-function end_of_day(date) {
+function endOfDay(date) {
   const d = new Date(date);
   d.setHours(23, 59, 59, 999);
   return d;
 }
 
+function startOfDay(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+// Tentuin batas periode (start/end) berdasarkan pilihan range.
+// range 'all' -> start = null (ga ada batas bawah).
+function getPeriodBounds(range, fromParam, toParam, now) {
+  if (range === "today") {
+    return { start: startOfDay(now), end: now };
+  }
+  if (range === "all") {
+    return { start: null, end: now };
+  }
+  if (range === "custom") {
+    if (!fromParam || !toParam) return { start: null, end: now };
+    const start = startOfDay(new Date(`${fromParam}T00:00:00`));
+    let end = endOfDay(new Date(`${toParam}T00:00:00`));
+    if (end > now) end = now;
+    return { start, end };
+  }
+  const days = Number(range);
+  const safeDays = Number.isFinite(days) && days > 0 ? days : 30;
+  const start = new Date(now.getTime() - safeDays * DAY_MS);
+  return { start, end: now };
+}
+
+// Periode pembanding: durasi yang sama, persis sebelum periode yang dipilih.
+function getPreviousBounds(start, end) {
+  if (!start) return null;
+  const duration = end.getTime() - start.getTime();
+  if (duration <= 0) return null;
+  const prevEnd = new Date(start.getTime() - 1);
+  const prevStart = new Date(prevEnd.getTime() - duration);
+  return { start: prevStart, end: prevEnd };
+}
+
+function filterByPeriod(items, start, end) {
+  return items.filter((item) => {
+    const t = new Date(item.created_at);
+    return (!start || t >= start) && t <= end;
+  });
+}
+
+// Metrik inti (dipakai buat periode aktif & periode pembanding)
+function computeCoreMetrics(applicantsSubset, allHistory, allLogs) {
+  const ids = new Set(applicantsSubset.map((a) => a.id));
+  const subLogs = allLogs.filter((l) => ids.has(l.applicant_id));
+  const subHistory = allHistory.filter((h) => ids.has(h.applicant_id));
+
+  const approvedCount = applicantsSubset.filter((a) => a.status === "approved").length;
+  const rejectedCount = applicantsSubset.filter((a) => a.status === "rejected").length;
+  const decisionTotal = approvedCount + rejectedCount;
+  const approvalRate = decisionTotal > 0 ? (approvedCount / decisionTotal) * 100 : null;
+
+  const historyByApplicant = {};
+  for (const h of subHistory) {
+    if (!historyByApplicant[h.applicant_id]) historyByApplicant[h.applicant_id] = [];
+    historyByApplicant[h.applicant_id].push(h);
+  }
+  const decisionDurations = [];
+  for (const a of applicantsSubset) {
+    if (a.status !== "approved" && a.status !== "rejected") continue;
+    const decisionEntry = (historyByApplicant[a.id] || []).find((h) => h.to_status === a.status);
+    if (!decisionEntry) continue;
+    const d = (new Date(decisionEntry.created_at) - new Date(a.created_at)) / DAY_MS;
+    decisionDurations.push(d);
+  }
+  const avgDaysToDecision =
+    decisionDurations.length > 0
+      ? decisionDurations.reduce((sum, d) => sum + d, 0) / decisionDurations.length
+      : null;
+
+  return {
+    total: applicantsSubset.length,
+    approvedCount,
+    rejectedCount,
+    approvalRate,
+    avgDaysToDecision,
+    followUpTotal: subLogs.length,
+  };
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const range = searchParams.get("range") || "30"; // '7' | '14' | '30' | '90' | 'all'
+    const range = searchParams.get("range") || "30"; // 'today' | '7' | '14' | '30' | '90' | 'all' | 'custom'
+    const fromParam = searchParams.get("from"); // YYYY-MM-DD, dipakai kalau range === 'custom'
+    const toParam = searchParams.get("to");
+    const now = new Date();
 
     const supabase = supabaseAdmin();
 
@@ -36,19 +124,22 @@ export async function GET(request) {
     if (historyRes.error) throw historyRes.error;
     if (logsRes.error) throw logsRes.error;
 
-    let applicants = applicantsRes.data;
-    let history = historyRes.data;
-    let logs = logsRes.data;
+    const allApplicants = applicantsRes.data;
+    const allHistory = historyRes.data;
+    const allLogs = logsRes.data;
 
-    // --- Filter berdasarkan periode yang dipilih ---
-    if (range !== "all") {
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - Number(range));
-      applicants = applicants.filter((a) => new Date(a.created_at) >= cutoff);
-      const keepIds = new Set(applicants.map((a) => a.id));
-      history = history.filter((h) => keepIds.has(h.applicant_id));
-      logs = logs.filter((l) => keepIds.has(l.applicant_id));
-    }
+    const { start, end } = getPeriodBounds(range, fromParam, toParam, now);
+
+    const applicants = filterByPeriod(allApplicants, start, end);
+    const applicantIds = new Set(applicants.map((a) => a.id));
+    const history = allHistory.filter((h) => applicantIds.has(h.applicant_id));
+    const logs = allLogs.filter((l) => applicantIds.has(l.applicant_id));
+
+    // --- Periode pembanding (buat badge naik/turun di stat card) ---
+    const prevBounds = getPreviousBounds(start, end);
+    const compare = prevBounds
+      ? computeCoreMetrics(filterByPeriod(allApplicants, prevBounds.start, prevBounds.end), allHistory, allLogs)
+      : null;
 
     // --- Funnel conversion: berapa applicant yang PERNAH mencapai tiap tahap ---
     const reachedStages = {};
@@ -66,54 +157,77 @@ export async function GET(request) {
     const rejectedCount = applicants.filter((a) => a.status === "rejected").length;
 
     // --- Tren pendaftaran ---
-    // Range pendek (7/14 hari) tetep per-hari biar detail. Range panjang (30/90/semua)
-    // dikelompokin per minggu, soalnya puluhan bar harian jadi terlalu padet dibaca.
-    const totalDays = range === "all" ? 90 : Math.min(Number(range), 90);
-    const useWeekly = totalDays > 21;
-
+    // "Hari ini" -> per jam. Range pendek (7/14 hari) -> per hari. Range panjang
+    // (30/90/semua/custom lebar) -> per minggu, biar ga terlalu padet dibaca.
     let trend;
-    if (useWeekly) {
-      const weekCount = Math.ceil(totalDays / 7);
-      const buckets = [];
-      for (let w = weekCount - 1; w >= 0; w--) {
-        const end = new Date();
-        end.setDate(end.getDate() - w * 7);
-        const start = new Date(end);
-        start.setDate(start.getDate() - 6);
-        buckets.push({ start, end, label: `${start.getDate()}/${start.getMonth() + 1}` });
-      }
-      trend = buckets.map((b) => ({
-        date: b.label,
-        count: applicants.filter((a) => {
-          const created = new Date(a.created_at);
-          return created >= new Date(b.start.toDateString()) && created <= end_of_day(b.end);
-        }).length,
+    let trendGranularity;
+
+    if (range === "today") {
+      const currentHour = now.getHours();
+      trend = Array.from({ length: currentHour + 1 }, (_, h) => ({
+        date: `${String(h).padStart(2, "0")}:00`,
+        count: applicants.filter((a) => new Date(a.created_at).getHours() === h).length,
       }));
+      trendGranularity = "hourly";
     } else {
-      const days = [];
-      for (let i = totalDays - 1; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        days.push(localDateKey(d));
+      // Rentang aktual buat nge-bucket: pakai batas periode kalau ada,
+      // fallback ke tanggal pendaftar paling lama (buat "Semua").
+      let rangeStart = start;
+      if (!rangeStart) {
+        const oldest = allApplicants.reduce(
+          (min, a) => Math.min(min, new Date(a.created_at).getTime()),
+          now.getTime()
+        );
+        rangeStart = new Date(Math.max(oldest, now.getTime() - 90 * DAY_MS));
       }
-      trend = days.map((date) => ({
-        date,
-        count: applicants.filter((a) => localDateKey(a.created_at) === date).length,
-      }));
+      const totalDays = Math.max(1, Math.min(Math.round((end - rangeStart) / DAY_MS) + 1, 180));
+      const useWeekly = totalDays > 21;
+
+      if (useWeekly) {
+        const weekCount = Math.ceil(totalDays / 7);
+        const buckets = [];
+        for (let w = weekCount - 1; w >= 0; w--) {
+          const bucketEnd = new Date(end.getTime() - w * 7 * DAY_MS);
+          const bucketStart = new Date(bucketEnd.getTime() - 6 * DAY_MS);
+          buckets.push({
+            start: startOfDay(bucketStart),
+            end: endOfDay(bucketEnd),
+            label: `${bucketStart.getDate()}/${bucketStart.getMonth() + 1}`,
+          });
+        }
+        trend = buckets.map((b) => ({
+          date: b.label,
+          count: applicants.filter((a) => {
+            const created = new Date(a.created_at);
+            return created >= b.start && created <= b.end;
+          }).length,
+        }));
+        trendGranularity = "weekly";
+      } else {
+        const days = [];
+        for (let i = totalDays - 1; i >= 0; i--) {
+          days.push(localDateKey(new Date(end.getTime() - i * DAY_MS)));
+        }
+        trend = days.map((date) => ({
+          date,
+          count: applicants.filter((a) => localDateKey(a.created_at) === date).length,
+        }));
+        trendGranularity = "daily";
+      }
     }
 
     // --- Rata-rata waktu sampai keputusan (approved/rejected) dalam hari ---
-    const decisionDurations = [];
     const historyByApplicant = {};
     for (const h of history) {
       if (!historyByApplicant[h.applicant_id]) historyByApplicant[h.applicant_id] = [];
       historyByApplicant[h.applicant_id].push(h);
     }
+    const decisionDurations = [];
     for (const a of applicants) {
       if (a.status !== "approved" && a.status !== "rejected") continue;
       const decisionEntry = (historyByApplicant[a.id] || []).find((h) => h.to_status === a.status);
       if (!decisionEntry) continue;
-      const d = (new Date(decisionEntry.created_at) - new Date(a.created_at)) / (1000 * 60 * 60 * 24);
+      const d = (new Date(decisionEntry.created_at) - new Date(a.created_at)) / DAY_MS;
       decisionDurations.push(d);
     }
     const avgDaysToDecision =
@@ -122,9 +236,6 @@ export async function GET(request) {
         : null;
 
     // --- Top kota (diringkas dari domisili "Kecamatan, Kota" jadi kota aja) ---
-    // Data domisili disimpan sebagai "Kecamatan, Kota", tapi ada juga fallback manual
-    // tanpa koma. Kita ambil bagian kota-nya aja biar analitiknya ga kepecah-pecah
-    // per kecamatan (misal 5 pendaftar Jakarta Barat kepecah jadi 5 kecamatan beda).
     function extractKota(domisili) {
       const trimmed = domisili?.trim();
       if (!trimmed) return "Tidak diketahui";
@@ -164,12 +275,14 @@ export async function GET(request) {
     return NextResponse.json(
       {
         range,
+        periodStart: start ? start.toISOString() : null,
+        periodEnd: end.toISOString(),
         total: applicants.length,
         funnelConversion,
         approvedCount,
         rejectedCount,
         trend,
-        trendGranularity: useWeekly ? "weekly" : "daily",
+        trendGranularity,
         avgDaysToDecision,
         decisionCount: decisionDurations.length,
         topDomisili,
@@ -177,6 +290,7 @@ export async function GET(request) {
         followUpTotal: logs.length,
         followUpByResponse,
         followUpByChannel,
+        compare, // null kalau range === 'all' (ga ada periode pembanding yang jelas)
       },
       {
         headers: {
