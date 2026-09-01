@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   Search,
   Download,
+  RefreshCw,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
@@ -33,6 +34,19 @@ function toWhatsAppLink(phone) {
     digits = "62" + digits;
   }
   return `https://wa.me/${digits}`;
+}
+
+// "Diperbarui 5 detik lalu" / "2 menit lalu" — biar admin tau data-nya seger apa nggak
+// tanpa perlu tebak-tebak, berguna banget pas acara on-site yang datanya cepet berubah.
+function formatRelativeTime(date) {
+  if (!date) return "";
+  const diffSec = Math.max(0, Math.round((Date.now() - date.getTime()) / 1000));
+  if (diffSec < 5) return "Baru saja diperbarui";
+  if (diffSec < 60) return `Diperbarui ${diffSec} detik lalu`;
+  const diffMin = Math.round(diffSec / 60);
+  if (diffMin < 60) return `Diperbarui ${diffMin} menit lalu`;
+  const diffHour = Math.round(diffMin / 60);
+  return `Diperbarui ${diffHour} jam lalu`;
 }
 
 const STATUS_OPTIONS = [
@@ -73,6 +87,9 @@ function AdminDashboardContent() {
   const [summary, setSummary] = useState(null);
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [, setTick] = useState(0); // cuma buat trigger re-render tiap menit biar teks "X menit lalu" update
   const [deletingId, setDeletingId] = useState(null);
 
   // Filter & pagination state — nilai awal diambil dari URL, jadi kalau user
@@ -109,7 +126,22 @@ function AdminDashboardContent() {
     setSummary(summaryData);
     setApplicants(listData.applicants || []);
     setLoading(false);
+    setLastUpdated(new Date());
   }, [status, kategori, q]);
+
+  // Tombol refresh manual — dipisah dari `loading` (yang juga dipakai skeleton awal)
+  // biar animasi ikon berputar cuma jelas kelihatan pas user sengaja klik refresh.
+  async function handleManualRefresh() {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
+  }
+
+  // Update teks "X menit lalu" tiap 30 detik, tanpa perlu fetch ulang ke server.
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const refreshSummary = useCallback(() => {
     fetch("/api/dashboard/summary", { cache: "no-store" })
@@ -228,14 +260,28 @@ function AdminDashboardContent() {
           <h1 className="font-display font-bold text-2xl mb-1 tracking-tight">Dashboard Rekrutmen Mitra</h1>
           <p className="text-ink-muted">Rekapan dan status pendaftaran mitra Sejasa.</p>
         </div>
-        <button
-          onClick={exportCsv}
-          disabled={applicants.length === 0}
-          className="flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-ink hover:border-brand hover:text-brand hover:shadow-sm transition disabled:opacity-40 disabled:cursor-not-allowed shrink-0 bg-white"
-        >
-          <Download size={16} />
-          Export CSV
-        </button>
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          {lastUpdated && (
+            <span className="text-xs text-ink-muted mr-1">{formatRelativeTime(lastUpdated)}</span>
+          )}
+          <button
+            onClick={handleManualRefresh}
+            disabled={refreshing}
+            title="Muat ulang data terbaru"
+            className="flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-ink hover:border-brand hover:text-brand hover:shadow-sm transition disabled:opacity-60 shrink-0 bg-white"
+          >
+            <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
+            {refreshing ? "Memuat..." : "Refresh"}
+          </button>
+          <button
+            onClick={exportCsv}
+            disabled={applicants.length === 0}
+            className="flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-ink hover:border-brand hover:text-brand hover:shadow-sm transition disabled:opacity-40 disabled:cursor-not-allowed shrink-0 bg-white"
+          >
+            <Download size={16} />
+            Export CSV
+          </button>
+        </div>
       </div>
 
       {/* Summary cards */}
