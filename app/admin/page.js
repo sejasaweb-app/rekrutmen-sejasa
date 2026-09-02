@@ -66,7 +66,7 @@ const KATEGORI_OPTIONS = [
 
 const KATEGORI_STYLES = {
   massage: { label: "Massage", classes: "bg-brand-light text-brand" },
-  daily_cleaning: { label: "Daily Cleaning", classes: "bg-violet-100 text-violet-700" },
+  daily_cleaning: { label: "Daily Cleaning", classes: "bg-teal-100 text-teal-700" },
 };
 
 const FUNNEL_STEPS = [

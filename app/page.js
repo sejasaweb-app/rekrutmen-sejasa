@@ -261,7 +261,7 @@ export default function HomePage() {
               <div className="p-5 sm:p-6 border-t border-black/[0.04]">
                 <span
                   className="text-sm sm:text-base font-bold text-white rounded-full px-3.5 py-1.5 shadow-sm"
-                  style={{ background: "linear-gradient(135deg, #7C3AED, #5B21B6)" }}
+                  style={{ background: "linear-gradient(135deg, #0EA5A4, #0F766E)" }}
                 >
                   Daily Cleaning
                 </span>

@@ -37,7 +37,7 @@ const RANGE_OPTIONS = [
 
 const CATEGORY_COLORS = {
   Massage: "#E6007E",
-  "Daily Cleaning": "#7C3AED",
+  "Daily Cleaning": "#0F766E",
 };
 
 const KATEGORI_LABELS = { massage: "Massage", daily_cleaning: "Daily Cleaning" };
