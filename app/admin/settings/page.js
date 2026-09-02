@@ -91,7 +91,7 @@ export default function SettingsPage() {
             <div>
               <p className="font-semibold text-sm">Notifikasi WhatsApp Otomatis</p>
               <p className="text-xs text-ink-muted">
-                Kirim WA ke pelamar otomatis via Fonnte saat status diubah ke Diterima/Ditolak.
+                Kirim WA ke pelamar otomatis saat status diubah ke Diterima/Ditolak.
               </p>
             </div>
           </div>
@@ -166,7 +166,7 @@ export default function SettingsPage() {
               {!isOverLimit && isNearLimit && (
                 <div className="flex items-start gap-2 bg-amber-50 text-amber-700 text-xs rounded-lg p-3 mb-3">
                   <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-                  <span>Kuota WA bulan ini hampir habis, siap-siap kalau mau upgrade paket Fonnte.</span>
+                  <span>Kuota WA bulan ini hampir habis, siap-siap kalau mau upgrade paket.</span>
                 </div>
               )}
             </>
@@ -174,7 +174,7 @@ export default function SettingsPage() {
         })()}
 
         <label className="block text-xs font-medium text-ink-muted mb-1.5">
-          Limit bulanan (sesuaikan kalau paket Fonnte berubah)
+          Limit bulanan
         </label>
         <input
           type="number"

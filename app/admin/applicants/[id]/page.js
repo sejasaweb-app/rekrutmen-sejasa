@@ -279,8 +279,9 @@ export default function ApplicantDetailPage() {
           <div className="mb-6">
             <label className="block text-sm font-medium mb-2">Alasan Penolakan (opsional)</label>
             <p className="text-xs text-ink-muted mb-2">
-              Kalau diisi, otomatis disertakan di pesan WA penolakan ke pelamar. Beda dari
-              Catatan Internal di bawah (yang nggak pernah dikirim ke pelamar).
+              Kalau diisi, alasan ini akan otomatis disertakan dalam pesan WhatsApp penolakan
+              ke pelamar. Berbeda dengan Catatan Internal di bawah, yang hanya untuk arsip tim
+              dan tidak pernah dikirim ke pelamar.
             </p>
             <textarea
               className="input-field min-h-[80px]"

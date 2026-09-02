@@ -206,7 +206,7 @@ export default function ApprovedMitraTable() {
             <h2 className="font-display text-sm font-semibold">Mitra Diterima</h2>
           </div>
           <p className="text-xs text-ink-muted">
-            Difilter berdasarkan tanggal diterima (bukan tanggal daftar) — buat kebutuhan rekap KPI.
+            Difilter berdasarkan tanggal diterima, bukan tanggal daftar.
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">

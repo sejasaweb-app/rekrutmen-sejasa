@@ -328,7 +328,7 @@ export default function AnalyticsPage() {
         {/* Funnel conversion */}
         <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
           <h2 className="font-display text-sm font-semibold mb-4">Funnel Konversi</h2>
-          <p className="text-xs text-ink-muted mb-4">Jumlah pendaftar yang pernah mencapai tiap tahap.</p>
+          <p className="text-xs text-ink-muted mb-4">Jumlah pelamar yang berhasil mencapai setiap tahap seleksi.</p>
           <div className="space-y-3.5">
             {data.funnelConversion.map((stage) => {
               const pctOfTotal = data.total > 0 ? Math.round((stage.count / data.total) * 100) : 0;
