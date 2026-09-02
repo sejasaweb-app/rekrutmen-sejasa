@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseClient";
 import { sendWhatsAppNotification, renderTemplate } from "@/lib/fonnte";
+import { upsertApplicantRow } from "@/lib/googleSheets";
 
 export const dynamic = "force-dynamic";
+
+// Sync ke Google Sheet — "fire and forget". Gagal sync sheet TIDAK BOLEH
+// menggagalkan update status pelamar yang sudah tersimpan di DB.
+async function maybeSyncToSheet(applicant) {
+  try {
+    await upsertApplicantRow(applicant);
+  } catch (err) {
+    console.error("Gagal sync ke Google Sheet:", err);
+  }
+}
 
 const KATEGORI_LABELS = { massage: "Massage Therapist", daily_cleaning: "Daily Cleaning" };
 
@@ -125,6 +136,8 @@ export async function PATCH(request, { params }) {
     if (status && status !== before?.status) {
       await maybeSendStatusNotification(supabase, data, status);
     }
+
+    await maybeSyncToSheet(data);
 
     return NextResponse.json({ applicant: data });
   } catch (err) {

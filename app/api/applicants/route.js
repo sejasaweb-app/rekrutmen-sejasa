@@ -1,7 +1,18 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseClient";
+import { upsertApplicantRow } from "@/lib/googleSheets";
 
 export const dynamic = "force-dynamic";
+
+// Sync ke Google Sheet — "fire and forget". Gagal sync sheet TIDAK BOLEH
+// menggagalkan submit lamaran yang sudah tersimpan di DB.
+async function maybeSyncToSheet(applicant) {
+  try {
+    await upsertApplicantRow(applicant);
+  } catch (err) {
+    console.error("Gagal sync ke Google Sheet:", err);
+  }
+}
 
 
 // POST — submit lamaran baru (dipanggil dari form publik)
@@ -146,6 +157,8 @@ export async function POST(request) {
       .single();
 
     if (error) throw error;
+
+    await maybeSyncToSheet(data);
 
     return NextResponse.json({ applicant: data }, { status: 201 });
   } catch (err) {

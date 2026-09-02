@@ -55,7 +55,32 @@ publik (form apply) dan sisi admin (dashboard + status tracking).
    GOOGLE_DRIVE_FOLDER_ID=...
    ```
 
-## 3. Setup Fonnte (notifikasi WhatsApp otomatis)
+## 3. Setup Google Sheets (backup data pelamar, real-time)
+
+Setiap ada pendaftar baru atau status yang berubah, aplikasi otomatis
+nulis/update satu baris di Google Sheet — jadi ada backup raw data yang bisa
+diakses tanpa login ke `/admin`. Pakai OAuth yang sama dengan Google Drive di
+atas, cukup tambah scope Sheets.
+
+1. Buat spreadsheet baru di [sheets.google.com](https://sheets.google.com)
+   (nama bebas), pakai akun Google yang sama dengan yang dipakai buat OAuth di
+   atas — sheet-nya nanti diisi otomatis, ga perlu bikin kolom manual.
+2. Ambil Sheet ID dari URL-nya (`docs.google.com/spreadsheets/d/INI_SHEET_ID/edit`), isi ke:
+   ```
+   GOOGLE_SHEET_ID=...
+   ```
+3. Karena scope OAuth-nya nambah (`spreadsheets`, bukan cuma `drive.file`),
+   jalankan ulang script refresh token biar izinnya kepakai:
+   ```bash
+   node scripts/get-google-refresh-token.js
+   ```
+   Klik Allow lagi seperti sebelumnya, lalu update `GOOGLE_OAUTH_REFRESH_TOKEN`
+   di `.env.local` dengan token baru yang muncul.
+
+Sheet-nya akan otomatis dibuat tab bernama **"Pelamar"** dengan header di baris
+pertama saat pendaftar pertama masuk — ga perlu disiapkan manual.
+
+## 4. Setup Fonnte (notifikasi WhatsApp otomatis)
 
 1. Daftar/login ke [fonnte.com](https://fonnte.com), tambah device (scan QR pakai
    nomor WA yang mau dipakai buat kirim notifikasi ke pelamar).
@@ -73,7 +98,7 @@ publik (form apply) dan sisi admin (dashboard + status tracking).
 Fitur ini aman dinonaktifkan kapan saja lewat toggle di halaman Settingan —
 kalau nonaktif, update status jalan seperti biasa tanpa kirim WA.
 
-## 4. Jalankan lokal
+## 5. Jalankan lokal
 
 ```bash
 cp .env.example .env.local
@@ -86,7 +111,7 @@ npm run dev
 - Form publik: `http://localhost:3000/apply`
 - Admin: `http://localhost:3000/admin/login`
 
-## 5. Deploy (gratis)
+## 6. Deploy (gratis)
 
 1. Push repo ini ke GitHub.
 2. Buka [vercel.com](https://vercel.com), import repo GitHub-nya.
@@ -115,6 +140,7 @@ app/
 lib/
   supabaseClient.js            koneksi Supabase (public & admin)
   googleDrive.js                upload helper ke Google Drive
+  googleSheets.js               sync backup data pelamar ke Google Sheet
   fonnte.js                     helper kirim WA via Fonnte
 supabase/
   schema.sql                    schema DB + trigger status_history
