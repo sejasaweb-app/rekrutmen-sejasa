@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import PhotoPlaceholder from "@/components/PhotoPlaceholder";
-import CategoryIllustration from "@/components/CategoryIllustration";
+import PhotoPlaceholder from "@/components/PhotoPlaceholder";
 
 // Palet dikurasi — 4 warna yang berasa satu keluarga sama brand magenta,
 // bukan random warna default Tailwind.
@@ -234,12 +234,11 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="card overflow-hidden hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
-              <CategoryIllustration
-                src="/images/category-massage.png"
-                alt="Ilustrasi mitra Massage"
-                from="#F0169B"
-                to="#A80057"
+              <PhotoPlaceholder
+                src="/images/foto-massage.jpg"
+                label="Foto mitra Massage"
                 aspect="aspect-[4/3]"
+                frame={false}
               />
               <div className="p-5 sm:p-6 border-t border-black/[0.04]">
                 <span
@@ -254,12 +253,11 @@ export default function HomePage() {
               </div>
             </div>
             <div className="card overflow-hidden hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
-              <CategoryIllustration
-                src="/images/category-cleaning.png"
-                alt="Ilustrasi mitra Daily Cleaning"
-                from="#7C3AED"
-                to="#5B21B6"
+              <PhotoPlaceholder
+                src="/images/foto-cleaning.jpg"
+                label="Foto mitra Daily Cleaning"
                 aspect="aspect-[4/3]"
+                frame={false}
               />
               <div className="p-5 sm:p-6 border-t border-black/[0.04]">
                 <span
