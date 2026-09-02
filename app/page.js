@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import PhotoPlaceholder from "@/components/PhotoPlaceholder";
-import PhotoPlaceholder from "@/components/PhotoPlaceholder";
 
 // Palet dikurasi — 4 warna yang berasa satu keluarga sama brand magenta,
 // bukan random warna default Tailwind.
