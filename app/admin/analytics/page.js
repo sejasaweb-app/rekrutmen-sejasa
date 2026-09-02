@@ -14,6 +14,7 @@ import {
   CalendarRange,
   X,
 } from "lucide-react";
+import ApprovedMitraTable from "@/components/ApprovedMitraTable";
 
 const STAGE_LABELS = {
   data_baru: "Data Baru",
@@ -465,6 +466,8 @@ export default function AnalyticsPage() {
           )}
         </div>
       </div>
+
+      <ApprovedMitraTable />
     </div>
   );
 }
