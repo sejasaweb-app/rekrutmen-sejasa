@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
-import { ArrowLeft, FileText, Clock, MessageCircle, Phone, Mail, MoreHorizontal, FileSignature, ExternalLink } from "lucide-react";
+import { ArrowLeft, FileText, Clock, MessageCircle, Phone, Mail, MoreHorizontal, FileSignature, ExternalLink, Copy } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 
 const STATUS_FLOW = ["data_baru", "screening", "onboarding", "approved", "rejected"];
@@ -127,6 +127,18 @@ export default function ApplicantDetailPage() {
     }
     toast.success("Kontrak dibuat & link dikirim ke mitra");
     loadApplicant();
+  }
+
+  // Buat admin bisa share link manual (WA, email, dll) kalau kuota WA otomatis
+  // lagi habis — link-nya sama persis dengan yang dikirim lewat WA.
+  async function salinLinkTtd(token) {
+    const signUrl = `${window.location.origin}/sign/${token}`;
+    try {
+      await navigator.clipboard.writeText(signUrl);
+      toast.success("Link tanda tangan disalin");
+    } catch {
+      toast.error("Gagal menyalin link, coba lagi");
+    }
   }
 
   async function addLog() {
@@ -365,6 +377,16 @@ export default function ApplicantDetailPage() {
                     Preview PDF
                   </a>
                 )}
+                {applicant.contract_token && (
+                  <button
+                    type="button"
+                    onClick={() => salinLinkTtd(applicant.contract_token)}
+                    className="inline-flex items-center gap-1.5 text-sm text-brand hover:underline"
+                  >
+                    <Copy size={14} />
+                    Salin Link TTD
+                  </button>
+                )}
                 <button
                   onClick={kirimKontrak}
                   disabled={sendingContract}
@@ -373,6 +395,9 @@ export default function ApplicantDetailPage() {
                   {sendingContract ? "Mengirim..." : "Kirim Ulang"}
                 </button>
               </div>
+              <p className="text-xs text-ink-muted mt-2">
+                Kuota WA lagi habis? Klik &quot;Salin Link TTD&quot; terus kirim manual sendiri ke mitranya (WA/email/dll).
+              </p>
             </>
           ) : (
             <>
