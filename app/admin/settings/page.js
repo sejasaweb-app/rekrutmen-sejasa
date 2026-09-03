@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { MessageCircle, CheckCircle2, XCircle, Info, Gauge, AlertTriangle, FileSignature } from "lucide-react";
+import { MessageCircle, MessageSquareText, CheckCircle2, XCircle, Info, Gauge, AlertTriangle, FileSignature } from "lucide-react";
 
 const PLACEHOLDER_HINTS = [
   { key: "{nama}", desc: "Nama pelamar" },
@@ -185,49 +185,19 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Section 2: Kontrak Otomatis — toggle + pesan link tanda tangan, satu alur jadi satu card */}
+      {/* Section 2: Template Pesan Status — Diterima & Ditolak digabung lewat tab, bukan 2 card gede */}
       <div className="card p-6 mb-6">
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-              <FileSignature size={17} />
-            </div>
-            <div>
-              <p className="font-semibold text-sm">Kirim Kontrak Otomatis</p>
-              <p className="text-xs text-ink-muted">
-                Kalau OFF (default), kontrak selalu dikirim manual lewat tombol &quot;Kirim
-                Kontrak&quot; di halaman detail pelamar. Kalau ON, kontrak otomatis dibuat &amp;
-                dikirim begitu status diubah ke Diterima.
-              </p>
-            </div>
+        <div className="flex items-center gap-2.5 mb-4">
+          <div className="w-9 h-9 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+            <MessageSquareText size={17} />
           </div>
-          <Toggle checked={contractAutoSend} onChange={() => setContractAutoSend((v) => !v)} />
+          <div>
+            <p className="font-semibold text-sm">Template Pesan Status</p>
+            <p className="text-xs text-ink-muted">
+              Pesan yang terkirim otomatis saat status pelamar diubah.
+            </p>
+          </div>
         </div>
-
-        <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-4">
-          <label className="text-xs font-medium text-ink mb-1.5 block">
-            Pesan Link Tanda Tangan Kontrak
-          </label>
-          <p className="text-xs text-ink-muted mb-3">
-            Terkirim saat kontrak dibuat (manual atau otomatis). Placeholder tambahan:{" "}
-            <code className="bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px]">{"{link}"}</code>{" "}
-            — link halaman tanda tangan.
-          </p>
-          <textarea
-            className="input-field min-h-[100px] text-sm bg-white"
-            value={msgContract}
-            onChange={(e) => setMsgContract(e.target.value)}
-            placeholder="Halo {nama}, selamat bergabung sebagai {kategori}! Silakan tanda tangani kontrak: {link}"
-          />
-        </div>
-      </div>
-
-      {/* Section 3: Template Pesan Status — Diterima & Ditolak digabung lewat tab, bukan 2 card gede */}
-      <div className="card p-6 mb-6">
-        <p className="font-semibold text-sm mb-1">Template Pesan Status</p>
-        <p className="text-xs text-ink-muted mb-4">
-          Pesan yang terkirim otomatis saat status pelamar diubah.
-        </p>
 
         <div className="flex gap-1.5 mb-4 bg-gray-100 rounded-full p-1 w-fit">
           <button
@@ -287,6 +257,46 @@ export default function SettingsPage() {
               ))}
             </ul>
           </div>
+        </div>
+      </div>
+
+      {/* Section 3: Kontrak Otomatis — toggle + pesan link tanda tangan, satu alur jadi satu card (fitur terpisah, ditaruh paling bawah) */}
+      <div className="card p-6 mb-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+              <FileSignature size={17} />
+            </div>
+            <div>
+              <p className="font-semibold text-sm">Kirim Kontrak Otomatis</p>
+              <p className="text-xs text-ink-muted">
+                Kalau OFF (default), kontrak selalu dikirim manual lewat tombol &quot;Kirim
+                Kontrak&quot; di halaman detail pelamar. Kalau ON, kontrak otomatis dibuat &amp;
+                dikirim begitu status diubah ke Diterima.
+              </p>
+            </div>
+          </div>
+          <Toggle checked={contractAutoSend} onChange={() => setContractAutoSend((v) => !v)} />
+        </div>
+
+        <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-4">
+          <div className="flex items-center gap-2 mb-1.5">
+            <FileSignature size={14} className="text-purple-600" />
+            <label className="text-xs font-medium text-ink">
+              Pesan Link Tanda Tangan Kontrak
+            </label>
+          </div>
+          <p className="text-xs text-ink-muted mb-3">
+            Terkirim saat kontrak dibuat (manual atau otomatis). Placeholder tambahan:{" "}
+            <code className="bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px]">{"{link}"}</code>{" "}
+            — link halaman tanda tangan.
+          </p>
+          <textarea
+            className="input-field min-h-[100px] text-sm bg-white"
+            value={msgContract}
+            onChange={(e) => setMsgContract(e.target.value)}
+            placeholder="Halo {nama}, selamat bergabung sebagai {kategori}! Silakan tanda tangani kontrak: {link}"
+          />
         </div>
       </div>
 
