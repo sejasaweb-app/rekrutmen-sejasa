@@ -112,7 +112,11 @@ export default function SignContractPage() {
 
               <p className="text-sm text-ink-muted mt-4 mb-2">Tanda tangan di sini:</p>
               <div className="border-2 border-dashed border-gray-200 rounded-lg bg-white" style={{ touchAction: "none" }}>
-                <canvas ref={canvasRef} className="w-full block" style={{ height: 180 }} />
+                <canvas
+                  ref={canvasRef}
+                  className="w-full block"
+                  style={{ height: 180, touchAction: "none" }}
+                />
               </div>
 
               <div className="flex gap-2.5 mt-3">
