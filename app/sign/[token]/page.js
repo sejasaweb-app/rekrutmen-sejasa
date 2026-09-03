@@ -31,9 +31,11 @@ export default function SignContractPage() {
     const canvas = canvasRef.current;
     const resize = () => {
       const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      const savedData = padRef.current && !padRef.current.isEmpty() ? padRef.current.toData() : null;
       canvas.width = canvas.offsetWidth * ratio;
       canvas.height = canvas.offsetHeight * ratio;
       canvas.getContext("2d").scale(ratio, ratio);
+      if (savedData && padRef.current) padRef.current.fromData(savedData);
     };
     window.addEventListener("resize", resize);
     resize();

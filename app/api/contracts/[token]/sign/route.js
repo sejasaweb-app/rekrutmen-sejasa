@@ -4,6 +4,10 @@ import { generateFilledContract, embedSignatureAndLock } from "@/lib/contractGen
 import { uploadToDrive } from "@/lib/googleDrive";
 
 export const dynamic = "force-dynamic";
+// Alur ini generate PDF 2x + tempel tanda tangan + upload ke Google Drive dalam
+// satu request — di cold start (function baru boot + auth Google dari nol) ini
+// gampang lewat dari limit default 10s dan bikin percobaan pertama gagal diam-diam.
+export const maxDuration = 60;
 
 // POST — dipanggil dari halaman /sign/[token] setelah mitra gambar tanda tangan.
 // body: { signaturePng: 'data:image/png;base64,...' }

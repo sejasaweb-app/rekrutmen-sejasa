@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabaseClient";
 import { generateAndSendContract } from "@/lib/contractService";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 // POST — tombol "Kirim Kontrak" / "Kirim Ulang" di halaman detail admin.
 export async function POST(request, { params }) {
