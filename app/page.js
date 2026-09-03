@@ -74,10 +74,10 @@ const DISPATCHER_POINTS = [
 ];
 
 const REGULAR_POINTS = [
-  "Job dengan sistem rebutan",
-  "Area job sesuai yang tersedia saat itu",
-  "Pendapatan mengikuti job yang berhasil diambil",
-  "Jadwal fleksibel, menyesuaikan ketersediaan mitra",
+  { title: "Job dengan sistem rebutan", desc: "Orderan terbuka, siapa cepat ambil dia dapat." },
+  { title: "Area job sesuai yang tersedia saat itu", desc: "Lokasi kerja mengikuti ketersediaan job di sistem." },
+  { title: "Pendapatan mengikuti job yang berhasil diambil", desc: "Besaran income tergantung jumlah job yang kamu kerjakan." },
+  { title: "Jadwal fleksibel, menyesuaikan ketersediaan mitra", desc: "Jadwal kerja tergantung ketersediaan mitra saat itu." },
 ];
 
 const STEPS = [
@@ -209,12 +209,9 @@ export default function HomePage() {
       <section className="px-4 sm:px-6 py-12 sm:py-20 bg-[#FAFAFA]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-7 sm:mb-12">
-            <h2 className="font-display font-bold text-2xl sm:text-4xl tracking-tight flex items-center justify-center gap-2.5 sm:gap-4 flex-wrap">
-              <span className="text-brand">Mitra Dispatcher</span>
-              <span className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-ink text-white text-[11px] sm:text-xs font-bold uppercase tracking-wide shrink-0">
-                vs
-              </span>
-              <span className="text-gray-400">Mitra Reguler</span>
+            <h2 className="font-display font-bold text-2xl sm:text-3xl tracking-tight">
+              Perbedaan Mitra <span className="text-brand">Dispatcher</span> dan Mitra{" "}
+              <span className="text-gray-400">Reguler</span>
             </h2>
           </div>
           <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 items-start">
@@ -259,12 +256,15 @@ export default function HomePage() {
                 Mitra Reguler
               </h3>
               <ul className="space-y-3.5">
-                {REGULAR_POINTS.map((point) => (
-                  <li key={point} className="flex gap-2.5">
+                {REGULAR_POINTS.map((p) => (
+                  <li key={p.title} className="flex gap-2.5">
                     <span className="mt-0.5 shrink-0 w-5 h-5 rounded-full flex items-center justify-center bg-gray-200">
                       <Check size={13} className="text-gray-500" strokeWidth={3} />
                     </span>
-                    <span className="text-[13px] sm:text-sm text-ink-muted leading-relaxed">{point}</span>
+                    <span>
+                      <span className="block font-semibold text-sm sm:text-[15px] leading-snug text-gray-600">{p.title}</span>
+                      <span className="block text-[13px] sm:text-sm text-ink-muted leading-relaxed mt-0.5">{p.desc}</span>
+                    </span>
                   </li>
                 ))}
               </ul>
