@@ -71,6 +71,8 @@ export default function SettingsPage() {
     toast.success("Settingan tersimpan");
   }
 
+  const [activeTemplate, setActiveTemplate] = useState("diterima");
+
   if (loading) {
     return (
       <div className="max-w-2xl">
@@ -80,6 +82,26 @@ export default function SettingsPage() {
     );
   }
 
+  const pct = monthlyLimit > 0 ? Math.min(100, Math.round((waUsage.count / monthlyLimit) * 100)) : 0;
+  const isNearLimit = pct >= 90;
+  const isOverLimit = waUsage.count >= monthlyLimit;
+
+  const Toggle = ({ checked, onChange }) => (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={onChange}
+      className={`relative w-11 h-6 rounded-full transition shrink-0 ${checked ? "bg-brand" : "bg-gray-200"}`}
+    >
+      <span
+        className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+          checked ? "translate-x-5" : "translate-x-0"
+        }`}
+      />
+    </button>
+  );
+
   return (
     <div className="max-w-2xl">
       <Toaster position="top-center" />
@@ -88,8 +110,9 @@ export default function SettingsPage() {
         Atur notifikasi WhatsApp otomatis ke pelamar saat status diubah.
       </p>
 
+      {/* Section 1: Notifikasi WhatsApp — toggle + kuota, satu topik jadi satu card */}
       <div className="card p-6 mb-6">
-        <div className="flex items-start justify-between gap-4 mb-1">
+        <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-full bg-green-50 text-green-600 flex items-center justify-center shrink-0">
               <MessageCircle size={17} />
@@ -101,98 +124,70 @@ export default function SettingsPage() {
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={enabled}
-            onClick={() => setEnabled((v) => !v)}
-            className={`relative w-11 h-6 rounded-full transition shrink-0 ${
-              enabled ? "bg-brand" : "bg-gray-200"
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                enabled ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
-          </button>
+          <Toggle checked={enabled} onChange={() => setEnabled((v) => !v)} />
         </div>
-      </div>
 
-      <div className="card p-6 mb-6">
-        <div className="flex items-center gap-2.5 mb-4">
-          <div className="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-            <Gauge size={17} />
-          </div>
-          <div>
-            <p className="font-semibold text-sm">Pemakaian WA Bulan Ini</p>
-            <p className="text-xs text-ink-muted">
-              {waUsage.monthLabel ? `Periode ${waUsage.monthLabel}` : "Dihitung dari WA yang berhasil terkirim"}
+        <div className={`rounded-xl border border-gray-100 bg-gray-50/60 p-4 transition-opacity ${enabled ? "" : "opacity-50"}`}>
+          <div className="flex items-center gap-2 mb-2.5">
+            <Gauge size={14} className="text-blue-600" />
+            <p className="text-xs font-medium text-ink">
+              Pemakaian WA Bulan Ini
+              {waUsage.monthLabel ? ` · ${waUsage.monthLabel}` : ""}
             </p>
           </div>
+
+          <div className="flex items-end justify-between mb-1.5">
+            <span className="text-xl font-bold">
+              {waUsage.count}
+              <span className="text-sm font-normal text-ink-muted"> / {monthlyLimit}</span>
+            </span>
+            <span
+              className={`text-xs font-medium ${
+                isOverLimit ? "text-red-600" : isNearLimit ? "text-amber-600" : "text-ink-muted"
+              }`}
+            >
+              {pct}%
+            </span>
+          </div>
+          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
+            <div
+              className={`h-full rounded-full transition-all ${
+                isOverLimit ? "bg-red-500" : isNearLimit ? "bg-amber-500" : "bg-brand"
+              }`}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+
+          {isOverLimit && (
+            <div className="flex items-start gap-2 bg-red-50 text-red-700 text-xs rounded-lg p-3 mb-3">
+              <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+              <span>
+                Kuota bulan ini sudah habis — notifikasi WA otomatis berhenti terkirim sampai bulan
+                depan. Naikkan limit di bawah kalau paket Fonnte kamu sudah di-upgrade.
+              </span>
+            </div>
+          )}
+          {!isOverLimit && isNearLimit && (
+            <div className="flex items-start gap-2 bg-amber-50 text-amber-700 text-xs rounded-lg p-3 mb-3">
+              <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+              <span>Kuota WA bulan ini hampir habis, siap-siap kalau mau upgrade paket.</span>
+            </div>
+          )}
+
+          <label className="block text-xs font-medium text-ink-muted mb-1.5">Limit bulanan</label>
+          <input
+            type="number"
+            min={1}
+            className="input-field text-sm max-w-[160px] bg-white"
+            value={monthlyLimit}
+            onChange={(e) => setMonthlyLimit(e.target.value)}
+          />
         </div>
-
-        {(() => {
-          const pct = monthlyLimit > 0 ? Math.min(100, Math.round((waUsage.count / monthlyLimit) * 100)) : 0;
-          const isNearLimit = pct >= 90;
-          const isOverLimit = waUsage.count >= monthlyLimit;
-          return (
-            <>
-              <div className="flex items-end justify-between mb-1.5">
-                <span className="text-2xl font-bold">
-                  {waUsage.count}
-                  <span className="text-sm font-normal text-ink-muted"> / {monthlyLimit}</span>
-                </span>
-                <span
-                  className={`text-xs font-medium ${
-                    isOverLimit ? "text-red-600" : isNearLimit ? "text-amber-600" : "text-ink-muted"
-                  }`}
-                >
-                  {pct}%
-                </span>
-              </div>
-              <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
-                <div
-                  className={`h-full rounded-full transition-all ${
-                    isOverLimit ? "bg-red-500" : isNearLimit ? "bg-amber-500" : "bg-brand"
-                  }`}
-                  style={{ width: `${pct}%` }}
-                />
-              </div>
-
-              {isOverLimit && (
-                <div className="flex items-start gap-2 bg-red-50 text-red-700 text-xs rounded-lg p-3 mb-3">
-                  <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-                  <span>
-                    Kuota bulan ini sudah habis — notifikasi WA otomatis berhenti terkirim sampai
-                    bulan depan. Naikkan limit di bawah kalau paket Fonnte kamu sudah di-upgrade.
-                  </span>
-                </div>
-              )}
-              {!isOverLimit && isNearLimit && (
-                <div className="flex items-start gap-2 bg-amber-50 text-amber-700 text-xs rounded-lg p-3 mb-3">
-                  <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-                  <span>Kuota WA bulan ini hampir habis, siap-siap kalau mau upgrade paket.</span>
-                </div>
-              )}
-            </>
-          );
-        })()}
-
-        <label className="block text-xs font-medium text-ink-muted mb-1.5">
-          Limit bulanan
-        </label>
-        <input
-          type="number"
-          min={1}
-          className="input-field text-sm max-w-[160px]"
-          value={monthlyLimit}
-          onChange={(e) => setMonthlyLimit(e.target.value)}
-        />
       </div>
 
+      {/* Section 2: Kontrak Otomatis — toggle + pesan link tanda tangan, satu alur jadi satu card */}
       <div className="card p-6 mb-6">
-        <div className="flex items-start justify-between gap-4 mb-1">
+        <div className="flex items-start justify-between gap-4 mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
               <FileSignature size={17} />
@@ -206,71 +201,79 @@ export default function SettingsPage() {
               </p>
             </div>
           </div>
+          <Toggle checked={contractAutoSend} onChange={() => setContractAutoSend((v) => !v)} />
+        </div>
+
+        <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-4">
+          <label className="text-xs font-medium text-ink mb-1.5 block">
+            Pesan Link Tanda Tangan Kontrak
+          </label>
+          <p className="text-xs text-ink-muted mb-3">
+            Terkirim saat kontrak dibuat (manual atau otomatis). Placeholder tambahan:{" "}
+            <code className="bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px]">{"{link}"}</code>{" "}
+            — link halaman tanda tangan.
+          </p>
+          <textarea
+            className="input-field min-h-[100px] text-sm bg-white"
+            value={msgContract}
+            onChange={(e) => setMsgContract(e.target.value)}
+            placeholder="Halo {nama}, selamat bergabung sebagai {kategori}! Silakan tanda tangani kontrak: {link}"
+          />
+        </div>
+      </div>
+
+      {/* Section 3: Template Pesan Status — Diterima & Ditolak digabung lewat tab, bukan 2 card gede */}
+      <div className="card p-6 mb-6">
+        <p className="font-semibold text-sm mb-1">Template Pesan Status</p>
+        <p className="text-xs text-ink-muted mb-4">
+          Pesan yang terkirim otomatis saat status pelamar diubah.
+        </p>
+
+        <div className="flex gap-1.5 mb-4 bg-gray-100 rounded-full p-1 w-fit">
           <button
             type="button"
-            role="switch"
-            aria-checked={contractAutoSend}
-            onClick={() => setContractAutoSend((v) => !v)}
-            className={`relative w-11 h-6 rounded-full transition shrink-0 ${
-              contractAutoSend ? "bg-brand" : "bg-gray-200"
+            onClick={() => setActiveTemplate("diterima")}
+            className={`flex items-center gap-1.5 text-xs font-medium rounded-full px-3.5 py-1.5 transition ${
+              activeTemplate === "diterima" ? "bg-white text-green-700 shadow-sm" : "text-ink-muted"
             }`}
           >
-            <span
-              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                contractAutoSend ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
+            <CheckCircle2 size={13} /> Diterima
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTemplate("ditolak")}
+            className={`flex items-center gap-1.5 text-xs font-medium rounded-full px-3.5 py-1.5 transition ${
+              activeTemplate === "ditolak" ? "bg-white text-red-700 shadow-sm" : "text-ink-muted"
+            }`}
+          >
+            <XCircle size={13} /> Ditolak
           </button>
         </div>
-      </div>
 
-      <div className="card p-6 mb-6">
-        <div className="flex items-center gap-2 mb-1">
-          <FileSignature size={16} className="text-purple-600" />
-          <label className="text-sm font-semibold">Pesan Link Tanda Tangan Kontrak</label>
-        </div>
-        <p className="text-xs text-ink-muted mb-3">
-          Terkirim saat kontrak dibuat (manual atau otomatis). Placeholder tambahan: <code className="bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px]">{"{link}"}</code> — link halaman tanda tangan.
-        </p>
-        <textarea
-          className="input-field min-h-[120px] text-sm"
-          value={msgContract}
-          onChange={(e) => setMsgContract(e.target.value)}
-          placeholder="Halo {nama}, selamat bergabung sebagai {kategori}! Silakan tanda tangani kontrak: {link}"
-        />
-      </div>
+        {activeTemplate === "diterima" ? (
+          <div>
+            <p className="text-xs text-ink-muted mb-2">Terkirim otomatis saat status diubah ke Diterima.</p>
+            <textarea
+              className="input-field min-h-[140px] text-sm"
+              value={msgApproved}
+              onChange={(e) => setMsgApproved(e.target.value)}
+              placeholder="Halo {nama}, selamat! Lamaran kamu sebagai {kategori} diterima..."
+            />
+          </div>
+        ) : (
+          <div>
+            <p className="text-xs text-ink-muted mb-2">Terkirim otomatis saat status diubah ke Ditolak.</p>
+            <textarea
+              className="input-field min-h-[140px] text-sm"
+              value={msgRejected}
+              onChange={(e) => setMsgRejected(e.target.value)}
+              placeholder="Halo {nama}, terima kasih sudah melamar sebagai {kategori}..."
+            />
+          </div>
+        )}
 
-      <div className="card p-6 mb-6">
-        <div className="flex items-center gap-2 mb-1">
-          <CheckCircle2 size={16} className="text-green-600" />
-          <label className="text-sm font-semibold">Pesan untuk Status Diterima</label>
-        </div>
-        <p className="text-xs text-ink-muted mb-3">Terkirim otomatis saat status diubah ke Diterima.</p>
-        <textarea
-          className="input-field min-h-[120px] text-sm"
-          value={msgApproved}
-          onChange={(e) => setMsgApproved(e.target.value)}
-          placeholder="Halo {nama}, selamat! Lamaran kamu sebagai {kategori} diterima..."
-        />
-      </div>
-
-      <div className="card p-6 mb-6">
-        <div className="flex items-center gap-2 mb-1">
-          <XCircle size={16} className="text-red-600" />
-          <label className="text-sm font-semibold">Pesan untuk Status Ditolak</label>
-        </div>
-        <p className="text-xs text-ink-muted mb-3">Terkirim otomatis saat status diubah ke Ditolak.</p>
-        <textarea
-          className="input-field min-h-[120px] text-sm"
-          value={msgRejected}
-          onChange={(e) => setMsgRejected(e.target.value)}
-          placeholder="Halo {nama}, terima kasih sudah melamar sebagai {kategori}..."
-        />
-      </div>
-
-      <div className="card p-4 mb-6 bg-gray-50/60 border-dashed">
-        <div className="flex items-start gap-2">
-          <Info size={15} className="text-ink-muted mt-0.5 shrink-0" />
+        <div className="flex items-start gap-2 mt-4 pt-4 border-t border-gray-100">
+          <Info size={14} className="text-ink-muted mt-0.5 shrink-0" />
           <div className="text-xs text-ink-muted">
             <p className="font-medium text-ink mb-1">Placeholder yang bisa dipakai di pesan:</p>
             <ul className="space-y-0.5">
