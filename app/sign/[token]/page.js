@@ -2,13 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import Script from "next/script";
+import SignaturePad from "signature_pad";
 
 export default function SignContractPage() {
   const { token } = useParams();
   const canvasRef = useRef(null);
   const padRef = useRef(null);
-  const [libReady, setLibReady] = useState(false);
   const [data, setData] = useState(null);
   const [loadError, setLoadError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -28,7 +27,7 @@ export default function SignContractPage() {
   }, [token]);
 
   useEffect(() => {
-    if (!libReady || !canvasRef.current || padRef.current) return;
+    if (!canvasRef.current || padRef.current) return;
     const canvas = canvasRef.current;
     const resize = () => {
       const ratio = Math.max(window.devicePixelRatio || 1, 1);
@@ -38,13 +37,12 @@ export default function SignContractPage() {
     };
     window.addEventListener("resize", resize);
     resize();
-    // eslint-disable-next-line no-undef
     padRef.current = new SignaturePad(canvas, {
       backgroundColor: "rgba(255,255,255,0)",
       penColor: "rgb(10, 10, 100)",
     });
     return () => window.removeEventListener("resize", resize);
-  }, [libReady]);
+  }, [data]);
 
   async function handleSubmit() {
     if (!padRef.current || padRef.current.isEmpty()) {
@@ -74,11 +72,6 @@ export default function SignContractPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <Script
-        src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/4.1.7/signature_pad.umd.min.js"
-        onLoad={() => setLibReady(true)}
-      />
-
       <h1 className="text-lg font-bold text-brand mb-1">Tanda Tangan Perjanjian Kemitraan</h1>
       <p className="text-sm text-ink-muted mb-4">
         Baca dulu kontrak di bawah, lalu tanda tangan di kotak yang tersedia.
