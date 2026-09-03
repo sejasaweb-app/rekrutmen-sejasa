@@ -252,7 +252,7 @@ export default function HomePage() {
               <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 bg-gray-100">
                 <Clock size={20} className="text-gray-400" />
               </div>
-              <h3 className="font-display font-semibold text-lg sm:text-xl mb-4 text-gray-500">
+              <h3 className="font-display font-semibold text-lg sm:text-xl mb-4 text-ink">
                 Mitra Reguler
               </h3>
               <ul className="space-y-3.5">
