@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
-import { ArrowLeft, FileText, Clock, MessageCircle, Phone, Mail, MoreHorizontal } from "lucide-react";
+import { ArrowLeft, FileText, Clock, MessageCircle, Phone, Mail, MoreHorizontal, FileSignature, ExternalLink } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 
 const STATUS_FLOW = ["data_baru", "screening", "onboarding", "approved", "rejected"];
@@ -50,6 +50,7 @@ export default function ApplicantDetailPage() {
   const [catatan, setCatatan] = useState("");
   const [alasanPenolakan, setAlasanPenolakan] = useState("");
   const [saving, setSaving] = useState(false);
+  const [sendingContract, setSendingContract] = useState(false);
 
   const [logs, setLogs] = useState([]);
   const [logsLoading, setLogsLoading] = useState(true);
@@ -112,6 +113,19 @@ export default function ApplicantDetailPage() {
     } else {
       toast.success("Perubahan tersimpan");
     }
+    loadApplicant();
+  }
+
+  async function kirimKontrak() {
+    setSendingContract(true);
+    const res = await fetch(`/api/applicants/${id}/generate-contract`, { method: "POST" });
+    const data = await res.json();
+    setSendingContract(false);
+    if (!res.ok) {
+      toast.error(data.error || "Gagal mengirim kontrak");
+      return;
+    }
+    toast.success("Kontrak dibuat & link dikirim ke mitra");
     loadApplicant();
   }
 
@@ -308,6 +322,71 @@ export default function ApplicantDetailPage() {
           {saving ? "Memproses..." : "Proses"}
         </button>
       </div>
+
+      {/* Kontrak kemitraan — cuma relevan begitu status = Diterima */}
+      {applicant.status === "approved" && (
+        <div className="card p-6 mb-6">
+          <div className="flex items-center gap-2 mb-1">
+            <FileSignature size={16} className="text-purple-600" />
+            <h2 className="text-sm font-semibold">Kontrak Kemitraan</h2>
+          </div>
+
+          {applicant.contract_status === "ditandatangani" ? (
+            <>
+              <p className="text-xs text-green-700 bg-green-50 rounded-lg px-3 py-2 mt-3 mb-3 inline-block">
+                Kontrak sudah ditandatangani{applicant.contract_signed_at && ` pada ${new Date(applicant.contract_signed_at).toLocaleString("id-ID")}`}.
+              </p>
+              <div>
+                <a
+                  href={applicant.contract_url_signed}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm text-brand hover:underline"
+                >
+                  <ExternalLink size={14} />
+                  Lihat PDF final yang sudah ditandatangani
+                </a>
+              </div>
+            </>
+          ) : applicant.contract_status === "menunggu_ttd" ? (
+            <>
+              <p className="text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2 mt-3 mb-3">
+                Kontrak sudah dibuat & link tanda tangan sudah dikirim, menunggu mitra tanda tangan.
+              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                {applicant.contract_url_unsigned && (
+                  <a
+                    href={applicant.contract_url_unsigned}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-sm text-brand hover:underline"
+                  >
+                    <ExternalLink size={14} />
+                    Preview PDF
+                  </a>
+                )}
+                <button
+                  onClick={kirimKontrak}
+                  disabled={sendingContract}
+                  className="text-xs font-medium rounded-full px-4 py-2 border border-gray-200 text-ink-muted hover:border-brand hover:text-brand transition"
+                >
+                  {sendingContract ? "Mengirim..." : "Kirim Ulang"}
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-xs text-ink-muted mt-1 mb-3">
+                Mitra ini sudah Diterima. Klik tombol di bawah untuk membuat kontrak & mengirim
+                link tanda tangan lewat WhatsApp.
+              </p>
+              <button onClick={kirimKontrak} disabled={sendingContract} className="btn-primary text-sm px-6 py-2.5">
+                {sendingContract ? "Memproses..." : "Kirim Kontrak"}
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Follow-up log — dicatat sebelum ubah status resmi */}
       <div className="card p-6 mb-6">

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { MessageCircle, CheckCircle2, XCircle, Info, Gauge, AlertTriangle } from "lucide-react";
+import { MessageCircle, CheckCircle2, XCircle, Info, Gauge, AlertTriangle, FileSignature } from "lucide-react";
 
 const PLACEHOLDER_HINTS = [
   { key: "{nama}", desc: "Nama pelamar" },
@@ -22,6 +22,8 @@ export default function SettingsPage() {
   const [msgRejected, setMsgRejected] = useState("");
   const [monthlyLimit, setMonthlyLimit] = useState(1000);
   const [waUsage, setWaUsage] = useState({ count: 0, monthLabel: "" });
+  const [contractAutoSend, setContractAutoSend] = useState(false);
+  const [msgContract, setMsgContract] = useState("");
 
   async function load() {
     setLoading(true);
@@ -32,6 +34,8 @@ export default function SettingsPage() {
       setMsgApproved(data.settings.wa_message_approved || "");
       setMsgRejected(data.settings.wa_message_rejected || "");
       setMonthlyLimit(data.settings.wa_monthly_limit || 1000);
+      setContractAutoSend(!!data.settings.contract_auto_send_enabled);
+      setMsgContract(data.settings.wa_message_contract || "");
       if (data.waUsage) setWaUsage(data.waUsage);
     } else {
       toast.error(data.error || "Gagal ambil settingan");
@@ -53,6 +57,8 @@ export default function SettingsPage() {
         wa_message_approved: msgApproved,
         wa_message_rejected: msgRejected,
         wa_monthly_limit: Number(monthlyLimit) || 1000,
+        contract_auto_send_enabled: contractAutoSend,
+        wa_message_contract: msgContract,
       }),
     });
     const data = await res.json();
@@ -182,6 +188,55 @@ export default function SettingsPage() {
           className="input-field text-sm max-w-[160px]"
           value={monthlyLimit}
           onChange={(e) => setMonthlyLimit(e.target.value)}
+        />
+      </div>
+
+      <div className="card p-6 mb-6">
+        <div className="flex items-start justify-between gap-4 mb-1">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+              <FileSignature size={17} />
+            </div>
+            <div>
+              <p className="font-semibold text-sm">Kirim Kontrak Otomatis</p>
+              <p className="text-xs text-ink-muted">
+                Kalau OFF (default), kontrak selalu dikirim manual lewat tombol &quot;Kirim
+                Kontrak&quot; di halaman detail pelamar. Kalau ON, kontrak otomatis dibuat &amp;
+                dikirim begitu status diubah ke Diterima.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={contractAutoSend}
+            onClick={() => setContractAutoSend((v) => !v)}
+            className={`relative w-11 h-6 rounded-full transition shrink-0 ${
+              contractAutoSend ? "bg-brand" : "bg-gray-200"
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                contractAutoSend ? "translate-x-5" : "translate-x-0"
+              }`}
+            />
+          </button>
+        </div>
+      </div>
+
+      <div className="card p-6 mb-6">
+        <div className="flex items-center gap-2 mb-1">
+          <FileSignature size={16} className="text-purple-600" />
+          <label className="text-sm font-semibold">Pesan Link Tanda Tangan Kontrak</label>
+        </div>
+        <p className="text-xs text-ink-muted mb-3">
+          Terkirim saat kontrak dibuat (manual atau otomatis). Placeholder tambahan: <code className="bg-white border border-gray-200 rounded px-1.5 py-0.5 text-[11px]">{"{link}"}</code> — link halaman tanda tangan.
+        </p>
+        <textarea
+          className="input-field min-h-[120px] text-sm"
+          value={msgContract}
+          onChange={(e) => setMsgContract(e.target.value)}
+          placeholder="Halo {nama}, selamat bergabung sebagai {kategori}! Silakan tanda tangani kontrak: {link}"
         />
       </div>
 

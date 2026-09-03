@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseClient";
 import { sendWhatsAppNotification, renderTemplate } from "@/lib/fonnte";
 import { upsertApplicantRow } from "@/lib/googleSheets";
+import { generateAndSendContract } from "@/lib/contractService";
 
 export const dynamic = "force-dynamic";
 
@@ -92,6 +93,23 @@ async function maybeSendStatusNotification(supabase, applicant, newStatus) {
 }
 
 
+// Kirim kontrak otomatis HANYA kalau status baru = approved DAN admin sudah
+// nyalain toggle contract_auto_send_enabled di Pengaturan. Default toggle itu
+// OFF, jadi secara default kontrak selalu dikirim manual lewat tombol di
+// halaman detail — approve tidak otomatis mengirim dokumen legal ke mitra.
+async function maybeAutoSendContract(supabase, applicant, newStatus) {
+  if (newStatus !== "approved") return;
+  if (applicant.contract_status && applicant.contract_status !== "belum_dibuat") return;
+
+  try {
+    const { data: settings } = await supabase.from("app_settings").select("contract_auto_send_enabled").eq("id", 1).single();
+    if (!settings?.contract_auto_send_enabled) return;
+    await generateAndSendContract(supabase, applicant);
+  } catch (err) {
+    console.error("Auto-send kontrak gagal:", err);
+  }
+}
+
 export async function GET(request, { params }) {
   const supabase = supabaseAdmin();
   const { data, error } = await supabase
@@ -135,6 +153,7 @@ export async function PATCH(request, { params }) {
     // (bukan cuma save catatan, dan bukan klik status yang sama lagi).
     if (status && status !== before?.status) {
       await maybeSendStatusNotification(supabase, data, status);
+      await maybeAutoSendContract(supabase, data, status);
     }
 
     await maybeSyncToSheet(data);

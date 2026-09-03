@@ -57,7 +57,10 @@ export async function GET() {
 export async function PATCH(request) {
   try {
     const body = await request.json();
-    const { wa_notif_enabled, wa_message_approved, wa_message_rejected, wa_monthly_limit } = body;
+    const {
+      wa_notif_enabled, wa_message_approved, wa_message_rejected, wa_monthly_limit,
+      contract_auto_send_enabled, wa_message_contract,
+    } = body;
 
     const updatePayload = {};
     if (typeof wa_notif_enabled === "boolean") updatePayload.wa_notif_enabled = wa_notif_enabled;
@@ -66,6 +69,10 @@ export async function PATCH(request) {
     if (typeof wa_monthly_limit === "number" && wa_monthly_limit > 0) {
       updatePayload.wa_monthly_limit = Math.floor(wa_monthly_limit);
     }
+    if (typeof contract_auto_send_enabled === "boolean") {
+      updatePayload.contract_auto_send_enabled = contract_auto_send_enabled;
+    }
+    if (typeof wa_message_contract === "string") updatePayload.wa_message_contract = wa_message_contract;
 
     const supabase = supabaseAdmin();
     const { data, error } = await supabase
