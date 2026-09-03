@@ -165,7 +165,7 @@ export default function HomePage() {
               ))}
             </div>
             <span className="text-sm sm:text-base text-ink-muted text-left leading-snug">
-              <span className="font-extrabold text-brand text-base sm:text-xl">2.500+</span>{" "}
+              <span className="font-extrabold text-brand text-base sm:text-xl">5.000+</span>{" "}
               Pekerjaan sudah diselesaikan oleh Mitra Dispatcher Sejasa
             </span>
           </div>
