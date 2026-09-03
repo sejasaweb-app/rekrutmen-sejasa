@@ -18,8 +18,9 @@ export default function FloatingWhatsApp() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Ga usah muncul di admin panel — ini buat calon mitra, bukan internal tim
-  if (pathname?.startsWith("/admin")) return null;
+  // Cuma tampil di landing page pendaftaran ("/") — di halaman lain (admin,
+  // tanda tangan kontrak, dst) ganggu dan gak relevan.
+  if (pathname !== "/") return null;
 
   const link = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(DEFAULT_MESSAGE)}`;
 
