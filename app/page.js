@@ -209,8 +209,12 @@ export default function HomePage() {
       <section className="px-4 sm:px-6 py-12 sm:py-20 bg-[#FAFAFA]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-7 sm:mb-12">
-            <h2 className="font-display font-bold text-2xl sm:text-3xl tracking-tight">
-              Perbedaan Mitra Dispatcher dan Mitra Reguler
+            <h2 className="font-display font-bold text-2xl sm:text-4xl tracking-tight flex items-center justify-center gap-2.5 sm:gap-4 flex-wrap">
+              <span className="text-brand">Mitra Dispatcher</span>
+              <span className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-ink text-white text-[11px] sm:text-xs font-bold uppercase tracking-wide shrink-0">
+                vs
+              </span>
+              <span className="text-gray-400">Mitra Reguler</span>
             </h2>
           </div>
           <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 items-start">
