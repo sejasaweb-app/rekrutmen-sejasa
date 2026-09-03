@@ -209,12 +209,9 @@ export default function HomePage() {
       <section className="px-4 sm:px-6 py-12 sm:py-20 bg-[#FAFAFA]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-7 sm:mb-12">
-            <h2 className="font-display font-bold text-2xl sm:text-3xl mb-2 sm:mb-3 tracking-tight">
+            <h2 className="font-display font-bold text-2xl sm:text-3xl tracking-tight">
               Perbedaan Mitra Dispatcher dan Mitra Reguler
             </h2>
-            <p className="text-ink-muted text-[15px] sm:text-base max-w-md mx-auto">
-              Dua jalur buat jadi mitra Sejasa — pilih yang paling cocok sama kamu.
-            </p>
           </div>
           <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 items-start">
             {/* Dispatcher — ditonjolkan */}
