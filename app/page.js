@@ -1,7 +1,5 @@
 import Link from "next/link";
 import {
-  MapPin,
-  Wallet,
   Clock,
   ShieldCheck,
   Headphones,
@@ -13,6 +11,7 @@ import {
   ArrowRight,
   CalendarCheck,
   Check,
+  Gift,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import PhotoPlaceholder from "@/components/PhotoPlaceholder";
@@ -21,25 +20,18 @@ import PhotoPlaceholder from "@/components/PhotoPlaceholder";
 // bukan random warna default Tailwind.
 const BENEFITS = [
   {
-    icon: MapPin,
-    title: "Job Sesuai Wilayah",
-    desc: "Orderan yang masuk disesuaikan sama radius wilayah kerja kamu, jadi lebih dekat dan efisien.",
+    icon: Gift,
+    title: "Pendaftaran Gratis",
+    desc: "Tanpa dipungut biaya apapun buat gabung jadi mitra Sejasa.",
     from: "#F0169B",
     to: "#A80057",
   },
   {
-    icon: Wallet,
-    title: "Penghasilan Terjamin",
-    desc: "Dapetin penghasilan yang jelas dari tiap orderan yang kamu selesaikan, tanpa perlu nyari pelanggan sendiri.",
+    icon: Zap,
+    title: "Proses Daftar Cepat",
+    desc: "Isi form, verifikasi, langsung bisa mulai — ga ribet.",
     from: "#F59E0B",
     to: "#B45309",
-  },
-  {
-    icon: Clock,
-    title: "Jadwal Kerja Terstruktur",
-    desc: "Jadwal diatur lewat sistem sesuai ketersediaan & kebutuhan area, biar adil dan teratur buat semua mitra.",
-    from: "#7C3AED",
-    to: "#5B21B6",
   },
   {
     icon: ShieldCheck,
@@ -54,13 +46,6 @@ const BENEFITS = [
     desc: "Ada Tim Khusus Sejasa Official yang siap bantu langsung kalau kamu butuh dukungan di lapangan.",
     from: "#7C3AED",
     to: "#5B21B6",
-  },
-  {
-    icon: Zap,
-    title: "Proses Daftar Cepat",
-    desc: "Isi form, verifikasi, langsung bisa mulai — ga ribet.",
-    from: "#F0169B",
-    to: "#A80057",
   },
 ];
 
@@ -181,7 +166,7 @@ export default function HomePage() {
               Beberapa keuntungan yang kamu dapat sebagai mitra Dispatcher Sejasa.
             </p>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
             {BENEFITS.map((b) => {
               const Icon = b.icon;
               return (
