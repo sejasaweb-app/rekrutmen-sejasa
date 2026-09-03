@@ -14,7 +14,7 @@ export default function SignContractPage() {
   const [status, setStatus] = useState({ text: "", type: "" });
 
   useEffect(() => {
-    fetch(`/api/contracts/${token}`)
+    fetch(`/api/contracts/${token}`, { cache: "no-store" })
       .then((res) => res.json().then((body) => ({ ok: res.ok, body })))
       .then(({ ok, body }) => {
         if (!ok) {

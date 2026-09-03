@@ -20,11 +20,14 @@ export async function GET(request, { params }) {
     return NextResponse.json({ error: "Link tidak valid atau kontrak tidak ditemukan" }, { status: 404 });
   }
 
-  return NextResponse.json({
-    nama: data.nama,
-    kategori: KATEGORI_LABELS[data.kategori] || data.kategori,
-    status: data.contract_status,
-    previewUrl: data.contract_url_unsigned,
-    signedUrl: data.contract_url_signed,
-  });
+  return NextResponse.json(
+    {
+      nama: data.nama,
+      kategori: KATEGORI_LABELS[data.kategori] || data.kategori,
+      status: data.contract_status,
+      previewUrl: data.contract_url_unsigned,
+      signedUrl: data.contract_url_signed,
+    },
+    { headers: { "Cache-Control": "no-store, must-revalidate" } }
+  );
 }
