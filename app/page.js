@@ -11,6 +11,8 @@ import {
   GraduationCap,
   Sparkles,
   ArrowRight,
+  CalendarCheck,
+  Check,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import PhotoPlaceholder from "@/components/PhotoPlaceholder";
@@ -60,6 +62,22 @@ const BENEFITS = [
     from: "#F0169B",
     to: "#A80057",
   },
+];
+
+// Perbandingan Mitra Dispatcher vs Reguler — Dispatcher sengaja ditonjolkan
+// (border & background brand, poin lebih hidup) buat dorong konversi ke jalur ini.
+const DISPATCHER_POINTS = [
+  { title: "Job Terjadwal Otomatis", desc: "Tinggal terima, gak perlu buka app terus buat rebutan orderan." },
+  { title: "Area Sesuai Wilayah Jangkauan", desc: "Job selalu dekat dari lokasi kamu, hemat waktu & ongkos jalan." },
+  { title: "Penghasilan Terjamin", desc: "Ada kepastian income tiap minggu, gak was-was sepi orderan." },
+  { title: "Job Lebih Banyak", desc: "Orderan mengalir rutin karena udah masuk sistem penjadwalan." },
+];
+
+const REGULAR_POINTS = [
+  "Job dengan sistem rebutan",
+  "Area job sesuai yang tersedia saat itu",
+  "Pendapatan mengikuti job yang berhasil diambil",
+  "Jadwal fleksibel, menyesuaikan ketersediaan mitra",
 ];
 
 const STEPS = [
@@ -183,6 +201,73 @@ export default function HomePage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Dispatcher vs Reguler */}
+      <section className="px-4 sm:px-6 py-12 sm:py-20 bg-[#FAFAFA]">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-7 sm:mb-12">
+            <h2 className="font-display font-bold text-2xl sm:text-3xl mb-2 sm:mb-3 tracking-tight">
+              Perbedaan Mitra Dispatcher dan Mitra Reguler
+            </h2>
+            <p className="text-ink-muted text-[15px] sm:text-base max-w-md mx-auto">
+              Dua jalur buat jadi mitra Sejasa — pilih yang paling cocok sama kamu.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 items-start">
+            {/* Dispatcher — ditonjolkan */}
+            <div
+              className="relative rounded-card p-5 sm:p-7 bg-white border-2 shadow-xl"
+              style={{ borderColor: "#E6007E" }}
+            >
+              <div
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 shadow-md"
+                style={{ background: "linear-gradient(135deg, #F0169B, #A80057)" }}
+              >
+                <CalendarCheck size={22} className="text-white" />
+              </div>
+              <h3 className="font-display font-bold text-lg sm:text-xl mb-4 text-brand">
+                Mitra Dispatcher
+              </h3>
+              <ul className="space-y-3.5">
+                {DISPATCHER_POINTS.map((p) => (
+                  <li key={p.title} className="flex gap-2.5">
+                    <span
+                      className="mt-0.5 shrink-0 w-5 h-5 rounded-full flex items-center justify-center"
+                      style={{ background: "#E6007E" }}
+                    >
+                      <Check size={13} className="text-white" strokeWidth={3} />
+                    </span>
+                    <span>
+                      <span className="block font-semibold text-sm sm:text-[15px] leading-snug">{p.title}</span>
+                      <span className="block text-[13px] sm:text-sm text-ink-muted leading-relaxed mt-0.5">{p.desc}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Reguler — netral */}
+            <div className="rounded-card p-5 sm:p-7 bg-white border border-gray-200">
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 bg-gray-100">
+                <Clock size={20} className="text-gray-400" />
+              </div>
+              <h3 className="font-display font-semibold text-lg sm:text-xl mb-4 text-gray-500">
+                Mitra Reguler
+              </h3>
+              <ul className="space-y-3.5">
+                {REGULAR_POINTS.map((point) => (
+                  <li key={point} className="flex gap-2.5">
+                    <span className="mt-0.5 shrink-0 w-5 h-5 rounded-full flex items-center justify-center bg-gray-200">
+                      <Check size={13} className="text-gray-500" strokeWidth={3} />
+                    </span>
+                    <span className="text-[13px] sm:text-sm text-ink-muted leading-relaxed">{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
