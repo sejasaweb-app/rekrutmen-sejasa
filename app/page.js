@@ -186,7 +186,7 @@ export default function HomePage() {
       </section>
 
       {/* Benefits */}
-      <section className="px-4 sm:px-6 py-12 sm:py-20">
+      <section className="px-4 sm:px-6 pt-12 pb-6 sm:pt-20 sm:pb-10">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-7 sm:mb-12">
             <h2 className="font-display font-bold text-2xl sm:text-3xl mb-2 sm:mb-3 tracking-tight">Kenapa Gabung Jadi Mitra?</h2>
@@ -194,13 +194,13 @@ export default function HomePage() {
               Beberapa keuntungan yang kamu dapat sebagai mitra Dispatcher Sejasa.
             </p>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 items-stretch">
             {BENEFITS.map((b) => {
               const Icon = b.icon;
               return (
                 <div
                   key={b.title}
-                  className="card p-3.5 sm:p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-200"
+                  className="card h-full p-3.5 sm:p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-200"
                 >
                   <div
                     className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center mb-2.5 sm:mb-4 shadow-md"
