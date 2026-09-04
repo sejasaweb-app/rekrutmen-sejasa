@@ -12,6 +12,7 @@ import {
   CalendarCheck,
   Check,
   Gift,
+  MapPin,
 } from "lucide-react";
 import Logo from "@/components/Logo";
 import PhotoPlaceholder from "@/components/PhotoPlaceholder";
@@ -64,6 +65,8 @@ const REGULAR_POINTS = [
   { title: "Pendapatan mengikuti job yang berhasil diambil", desc: "Besaran income tergantung jumlah job yang kamu kerjakan." },
   { title: "Jadwal fleksibel, menyesuaikan ketersediaan mitra", desc: "Jadwal kerja tergantung ketersediaan mitra saat itu." },
 ];
+
+const COVERAGE_AREAS = ["Jabodetabek", "Bandung", "Surabaya"];
 
 const STEPS = [
   { icon: FileEdit, title: "Isi Formulir", desc: "Lengkapi data diri dan pilih kategori layanan." },
@@ -153,6 +156,26 @@ export default function HomePage() {
               <span className="font-extrabold text-brand text-base sm:text-xl">5.000+</span>{" "}
               Pekerjaan sudah diselesaikan oleh Mitra Dispatcher Sejasa
             </span>
+          </div>
+        </div>
+      </section>
+
+      {/* Cakupan Wilayah */}
+      <section className="px-4 sm:px-6 pb-10 sm:pb-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <p className="text-xs sm:text-sm font-semibold text-ink-muted uppercase tracking-wide mb-3 sm:mb-4">
+            Sudah Tersedia di
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+            {COVERAGE_AREAS.map((area) => (
+              <span
+                key={area}
+                className="inline-flex items-center gap-1.5 bg-white border border-gray-200 rounded-full pl-3 pr-4 py-2 shadow-sm"
+              >
+                <MapPin size={14} className="text-brand shrink-0" />
+                <span className="text-sm sm:text-[15px] font-semibold text-ink">{area}</span>
+              </span>
+            ))}
           </div>
         </div>
       </section>
