@@ -161,37 +161,26 @@ export default function HomePage() {
       </section>
 
       {/* Cakupan Wilayah */}
-      <section className="px-4 sm:px-6 pb-12 sm:pb-6">
-        <div className="max-w-2xl mx-auto">
-          <div
-            className="rounded-2xl sm:rounded-3xl px-5 py-6 sm:px-8 sm:py-8 text-center border"
-            style={{ background: "linear-gradient(180deg, #FDE6F1, #FFFFFF)", borderColor: "#F9C9E1" }}
-          >
-            <div className="inline-flex items-center gap-1.5 mb-3 sm:mb-4">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-brand"></span>
-              </span>
-              <p className="text-xs sm:text-sm font-bold text-brand uppercase tracking-wide">
-                Sudah Tersedia di
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
-              {COVERAGE_AREAS.map((area) => (
+      <section className="px-4 sm:px-6 pb-10 sm:pb-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <p className="text-xs sm:text-sm font-bold text-ink-muted uppercase tracking-wide mb-3 sm:mb-4">
+            Sudah Tersedia di
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+            {COVERAGE_AREAS.map((area) => (
+              <span
+                key={area}
+                className="inline-flex items-center gap-1.5 bg-white border border-gray-200 rounded-full pl-2.5 pr-4 py-2 shadow-sm hover:-translate-y-0.5 transition-transform duration-200"
+              >
                 <span
-                  key={area}
-                  className="inline-flex items-center gap-1.5 bg-white rounded-full pl-2.5 pr-4 py-2 sm:py-2.5 shadow-md hover:-translate-y-0.5 transition-transform duration-200"
+                  className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
+                  style={{ background: "linear-gradient(135deg, #F0169B, #A80057)" }}
                 >
-                  <span
-                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0"
-                    style={{ background: "linear-gradient(135deg, #F0169B, #A80057)" }}
-                  >
-                    <MapPin size={13} className="text-white" />
-                  </span>
-                  <span className="text-sm sm:text-[15px] font-bold text-ink">{area}</span>
+                  <MapPin size={13} className="text-white" />
                 </span>
-              ))}
-            </div>
+                <span className="text-sm sm:text-[15px] font-bold text-ink">{area}</span>
+              </span>
+            ))}
           </div>
         </div>
       </section>
