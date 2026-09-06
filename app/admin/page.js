@@ -317,15 +317,12 @@ function AdminDashboardContent() {
       <div className="card p-5 mb-6 hover:shadow-lg transition-shadow duration-200">
         <h2 className="font-display text-sm font-semibold mb-5">Funnel Status</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-          {FUNNEL_STEPS.map((step, i) => {
+          {FUNNEL_STEPS.map((step) => {
             const value = summary?.byStatus?.[step.value] ?? 0;
             const pct = funnelTotal > 0 ? (value / funnelTotal) * 100 : 0;
             const Icon = STATUS_META[step.value]?.icon;
-            // Kalau jumlah item ganjil, item terakhir sengaja dibikin selebar 2 kolom
-            // biar ngisi baris terakhir penuh — bukan nyempil sendirian di kiri.
-            const isLastOdd = FUNNEL_STEPS.length % 2 === 1 && i === FUNNEL_STEPS.length - 1;
             return (
-              <div key={step.value} className={isLastOdd ? "sm:col-span-2" : ""}>
+              <div key={step.value}>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-sm text-ink flex items-center gap-2">
                     {Icon ? (
