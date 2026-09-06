@@ -290,15 +290,18 @@ export default function ApprovedMitraTable() {
             className="input-field !pl-9 text-sm"
           />
         </div>
-        <select
-          value={kategori}
-          onChange={(e) => setKategori(e.target.value)}
-          className="input-field !w-auto text-sm"
-        >
-          {KATEGORI_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            value={kategori}
+            onChange={(e) => setKategori(e.target.value)}
+            className="input-field appearance-none !w-auto pr-9 text-sm cursor-pointer"
+          >
+            {KATEGORI_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+          <ChevronDown size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted" />
+        </div>
         <div className="text-xs text-ink-muted ml-auto">
           {loading ? "Memuat..." : `${sorted.length} mitra diterima`}
         </div>
@@ -373,15 +376,18 @@ export default function ApprovedMitraTable() {
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 text-ink-muted">
               Tampilkan
-              <select
-                className="input-field !w-auto !py-1.5 !px-3 text-sm"
-                value={pageSize}
-                onChange={(e) => setPageSize(Number(e.target.value))}
-              >
-                {PAGE_SIZE_OPTIONS.map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
+              <span className="relative inline-flex">
+                <select
+                  className="input-field appearance-none !w-auto !py-1.5 !pl-3 !pr-7 text-sm cursor-pointer"
+                  value={pageSize}
+                  onChange={(e) => setPageSize(Number(e.target.value))}
+                >
+                  {PAGE_SIZE_OPTIONS.map((n) => (
+                    <option key={n} value={n}>{n}</option>
+                  ))}
+                </select>
+                <ChevronDown size={13} className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-ink-muted" />
+              </span>
             </label>
             <div className="flex gap-2">
               <button
