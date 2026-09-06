@@ -316,7 +316,7 @@ function AdminDashboardContent() {
       {/* Funnel chart */}
       <div className="card p-5 mb-6 hover:shadow-lg transition-shadow duration-200">
         <h2 className="font-display text-sm font-semibold mb-5">Funnel Status</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+        <div className="grid grid-cols-1 gap-y-4">
           {FUNNEL_STEPS.map((step) => {
             const value = summary?.byStatus?.[step.value] ?? 0;
             const pct = funnelTotal > 0 ? (value / funnelTotal) * 100 : 0;
@@ -371,16 +371,30 @@ function AdminDashboardContent() {
             </button>
           )}
         </div>
-        <select className="input-field max-w-[180px]" value={status} onChange={(e) => setStatus(e.target.value)}>
-          {STATUS_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
-        <select className="input-field max-w-[180px]" value={kategori} onChange={(e) => setKategori(e.target.value)}>
-          {KATEGORI_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            className="input-field appearance-none pr-9 max-w-[180px] cursor-pointer"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            {STATUS_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+        </div>
+        <div className="relative">
+          <select
+            className="input-field appearance-none pr-9 max-w-[180px] cursor-pointer"
+            value={kategori}
+            onChange={(e) => setKategori(e.target.value)}
+          >
+            {KATEGORI_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+        </div>
         {hasActiveFilters && (
           <button
             onClick={resetFilters}
@@ -495,15 +509,18 @@ function AdminDashboardContent() {
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-2 text-ink-muted">
                 Tampilkan
-                <select
-                  className="input-field !w-auto !py-1.5 !px-3 text-sm"
-                  value={pageSize}
-                  onChange={(e) => setPageSize(Number(e.target.value))}
-                >
-                  {PAGE_SIZE_OPTIONS.map((n) => (
-                    <option key={n} value={n}>{n}</option>
-                  ))}
-                </select>
+                <span className="relative inline-flex">
+                  <select
+                    className="input-field appearance-none !w-auto !py-1.5 !pl-3 !pr-7 text-sm cursor-pointer"
+                    value={pageSize}
+                    onChange={(e) => setPageSize(Number(e.target.value))}
+                  >
+                    {PAGE_SIZE_OPTIONS.map((n) => (
+                      <option key={n} value={n}>{n}</option>
+                    ))}
+                  </select>
+                  <ChevronDown size={13} className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-ink-muted" />
+                </span>
               </label>
               <div className="flex gap-2">
                 <button
