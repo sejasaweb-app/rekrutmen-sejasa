@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
-import { ArrowLeft, FileText, Clock, MessageCircle, Phone, Mail, MoreHorizontal, FileSignature, ExternalLink, Copy } from "lucide-react";
+import { ArrowLeft, FileText, Clock, MessageCircle, Phone, Mail, MoreHorizontal, FileSignature, ExternalLink, Copy, ChevronDown } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 
 const STATUS_FLOW = ["data_baru", "screening", "onboarding", "approved", "rejected"];
@@ -457,15 +457,18 @@ export default function ApplicantDetailPage() {
             )}
           </div>
 
-          <select
-            className="input-field text-sm"
-            value={response}
-            onChange={(e) => setResponse(e.target.value)}
-          >
-            {RESPONSE_OPTIONS.map((r) => (
-              <option key={r} value={r}>{r}</option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              className="input-field appearance-none pr-9 text-sm cursor-pointer"
+              value={response}
+              onChange={(e) => setResponse(e.target.value)}
+            >
+              {RESPONSE_OPTIONS.map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+            <ChevronDown size={14} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+          </div>
 
           <textarea
             className="input-field text-sm min-h-[70px]"
