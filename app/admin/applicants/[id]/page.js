@@ -6,14 +6,24 @@ import toast, { Toaster } from "react-hot-toast";
 import { ArrowLeft, FileText, Clock, MessageCircle, Phone, Mail, MoreHorizontal, FileSignature, ExternalLink, Copy, ChevronDown } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 
-const STATUS_FLOW = ["data_baru", "screening", "onboarding", "approved", "rejected"];
+const STATUS_FLOW = ["data_baru", "pending", "screening", "onboarding", "approved", "rejected"];
 const STATUS_LABELS = {
   data_baru: "Data Baru",
+  pending: "Pending",
   screening: "Screening",
   onboarding: "Onboarding",
   approved: "Diterima",
   rejected: "Ditolak",
 };
+
+// Alasan preset buat status Pending — bisa juga pilih "Lainnya" buat isi custom.
+const PENDING_REASON_PRESETS = [
+  "Wilayah belum dibutuhkan saat ini",
+  "Area sepi/belum ada demand",
+  "Nunggu WA/telepon dibalas",
+  "Dokumen belum lengkap",
+  "Lainnya",
+];
 
 const CHANNEL_OPTIONS = [
   { value: "whatsapp", label: "WhatsApp", icon: MessageCircle },
@@ -49,6 +59,8 @@ export default function ApplicantDetailPage() {
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [catatan, setCatatan] = useState("");
   const [alasanPenolakan, setAlasanPenolakan] = useState("");
+  const [alasanPendingPreset, setAlasanPendingPreset] = useState(PENDING_REASON_PRESETS[0]);
+  const [alasanPendingCustom, setAlasanPendingCustom] = useState("");
   const [saving, setSaving] = useState(false);
   const [sendingContract, setSendingContract] = useState(false);
 
@@ -66,6 +78,17 @@ export default function ApplicantDetailPage() {
     setSelectedStatus(data.applicant?.status);
     setCatatan(data.applicant?.catatan_admin || "");
     setAlasanPenolakan(data.applicant?.alasan_penolakan || "");
+
+    // Alasan pending tersimpan sebagai teks bebas — kalau cocok sama salah satu
+    // preset, pilih preset itu di dropdown; kalau nggak, anggap custom ("Lainnya").
+    const savedAlasanPending = data.applicant?.alasan_pending || "";
+    if (savedAlasanPending && !PENDING_REASON_PRESETS.includes(savedAlasanPending)) {
+      setAlasanPendingPreset("Lainnya");
+      setAlasanPendingCustom(savedAlasanPending);
+    } else {
+      setAlasanPendingPreset(savedAlasanPending || PENDING_REASON_PRESETS[0]);
+      setAlasanPendingCustom("");
+    }
   }
 
   async function loadLogs() {
@@ -90,10 +113,18 @@ export default function ApplicantDetailPage() {
       toast.error("Catatan Internal wajib diisi");
       return;
     }
+    if (selectedStatus === "pending" && alasanPendingPreset === "Lainnya" && !alasanPendingCustom.trim()) {
+      toast.error("Alasan Pending wajib diisi");
+      return;
+    }
 
     setSaving(true);
     const body = { status: selectedStatus, catatan_admin: catatan };
     if (selectedStatus === "rejected") body.alasan_penolakan = alasanPenolakan;
+    if (selectedStatus === "pending") {
+      body.alasan_pending =
+        alasanPendingPreset === "Lainnya" ? alasanPendingCustom.trim() : alasanPendingPreset;
+    }
 
     const res = await fetch(`/api/applicants/${id}`, {
       method: "PATCH",
@@ -213,6 +244,12 @@ export default function ApplicantDetailPage() {
           <StatusBadge status={applicant.status} />
         </div>
 
+        {applicant.status === "pending" && applicant.alasan_pending && (
+          <p className="text-xs text-amber-700 bg-amber-50 rounded-lg px-3 py-2 mb-4">
+            Alasan Pending: {applicant.alasan_pending}
+          </p>
+        )}
+
         <dl className="grid grid-cols-2 gap-4 text-sm mb-6">
           <Field label="Kategori" value={applicant.kategori.replace("_", " ")} />
           <Field label="Domisili" value={applicant.domisili} />
@@ -300,6 +337,38 @@ export default function ApplicantDetailPage() {
             ))}
           </div>
         </div>
+
+        {selectedStatus === "pending" && (
+          <div className="mb-6">
+            <label className="block text-sm font-medium mb-2">
+              Alasan Pending <span className="text-red-500">*</span>
+            </label>
+            <p className="text-xs text-ink-muted mb-2">
+              Biar ketauan kenapa mitra ini nyangkut di Pending, bukan cuma numpuk di Data Baru.
+              Nanti gampang di-follow-up lagi kalau kondisinya berubah.
+            </p>
+            <div className="relative mb-2">
+              <select
+                className="input-field appearance-none pr-9 text-sm cursor-pointer"
+                value={alasanPendingPreset}
+                onChange={(e) => setAlasanPendingPreset(e.target.value)}
+              >
+                {PENDING_REASON_PRESETS.map((r) => (
+                  <option key={r} value={r}>{r}</option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+            </div>
+            {alasanPendingPreset === "Lainnya" && (
+              <textarea
+                className="input-field min-h-[70px]"
+                value={alasanPendingCustom}
+                onChange={(e) => setAlasanPendingCustom(e.target.value)}
+                placeholder="Tulis alasan pending-nya..."
+              />
+            )}
+          </div>
+        )}
 
         {selectedStatus === "rejected" && (
           <div className="mb-6">

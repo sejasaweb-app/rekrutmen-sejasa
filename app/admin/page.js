@@ -21,6 +21,7 @@ import {
   Trash2,
   X,
   Bike,
+  PauseCircle,
 } from "lucide-react";
 import StatusBadge, { STATUS_META } from "@/components/StatusBadge";
 
@@ -52,6 +53,7 @@ function formatRelativeTime(date) {
 const STATUS_OPTIONS = [
   { value: "", label: "Semua Status" },
   { value: "data_baru", label: "Data Baru" },
+  { value: "pending", label: "Pending" },
   { value: "screening", label: "Screening" },
   { value: "onboarding", label: "Onboarding" },
   { value: "approved", label: "Diterima" },
@@ -71,6 +73,7 @@ const KATEGORI_STYLES = {
 
 const FUNNEL_STEPS = [
   { value: "data_baru", label: "Data Baru", color: "#94A3B8" },
+  { value: "pending", label: "Pending", color: "#F59E0B" },
   { value: "screening", label: "Screening", color: "#3B82F6" },
   { value: "onboarding", label: "Onboarding", color: "#8B5CF6" },
   { value: "approved", label: "Diterima", color: "#16A34A" },
@@ -285,7 +288,7 @@ function AdminDashboardContent() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
         <SummaryCard
           icon={Users}
           label="Total Pendaftar"
@@ -304,6 +307,13 @@ function AdminDashboardContent() {
           label="Daily Cleaning"
           value={summary?.byKategori?.daily_cleaning ?? 0}
           accent="#3B82F6"
+        />
+        <SummaryCard
+          icon={PauseCircle}
+          label="Pending"
+          value={summary?.byStatus?.pending ?? 0}
+          accent="#F59E0B"
+          onClick={() => setStatus("pending")}
         />
         <SummaryCard
           icon={CheckCircle2}
@@ -597,11 +607,15 @@ function SkeletonRow() {
   );
 }
 
-function SummaryCard({ icon: Icon, label, value, accent, highlight }) {
+function SummaryCard({ icon: Icon, label, value, accent, highlight, onClick }) {
+  const Tag = onClick ? "button" : "div";
+  const clickableProps = onClick ? { onClick, type: "button" } : {};
+
   if (highlight) {
     return (
-      <div
-        className="card p-5 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+      <Tag
+        {...clickableProps}
+        className={`card p-5 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 text-left w-full ${onClick ? "cursor-pointer" : ""}`}
         style={{ backgroundColor: accent }}
       >
         <div className="flex items-center justify-between mb-4">
@@ -611,12 +625,15 @@ function SummaryCard({ icon: Icon, label, value, accent, highlight }) {
           </div>
         </div>
         <div className="text-3xl font-bold tracking-tight">{value}</div>
-      </div>
+      </Tag>
     );
   }
 
   return (
-    <div className="card p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200">
+    <Tag
+      {...clickableProps}
+      className={`card p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 text-left w-full ${onClick ? "cursor-pointer" : ""}`}
+    >
       <div className="flex items-center justify-between mb-4">
         <div className="text-[11px] uppercase tracking-wide text-gray-400 font-medium">{label}</div>
         <div
@@ -627,6 +644,6 @@ function SummaryCard({ icon: Icon, label, value, accent, highlight }) {
         </div>
       </div>
       <div className="text-3xl font-bold tracking-tight">{value}</div>
-    </div>
+    </Tag>
   );
 }

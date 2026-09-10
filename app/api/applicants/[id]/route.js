@@ -126,12 +126,13 @@ export async function GET(request, { params }) {
 export async function PATCH(request, { params }) {
   try {
     const body = await request.json();
-    const { status, catatan_admin, alasan_penolakan } = body;
+    const { status, catatan_admin, alasan_penolakan, alasan_pending } = body;
 
     const updatePayload = {};
     if (status) updatePayload.status = status;
     if (catatan_admin !== undefined) updatePayload.catatan_admin = catatan_admin;
     if (alasan_penolakan !== undefined) updatePayload.alasan_penolakan = alasan_penolakan;
+    if (alasan_pending !== undefined) updatePayload.alasan_pending = alasan_pending;
 
     const supabase = supabaseAdmin();
     const { data: before } = await supabase
