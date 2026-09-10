@@ -35,7 +35,7 @@ export default function AdminLoginPage() {
           <div className="mb-5">
             <Logo size={44} />
           </div>
-          <h1 className="font-display text-xl font-bold mb-1 tracking-tight">Admin Dispatcher Sejasa</h1>
+          <h1 className="font-display text-xl font-bold mb-1 tracking-tight">Admin Sejasa Home Team</h1>
           <p className="text-ink-muted text-sm mb-7">Masuk untuk kelola pendaftaran mitra.</p>
 
           <form onSubmit={handleLogin} className="space-y-3.5">
@@ -67,7 +67,7 @@ export default function AdminLoginPage() {
             </button>
           </form>
         </div>
-        <p className="text-center text-xs text-ink-muted mt-5">Dispatcher Sejasa — Internal Admin Tool</p>
+        <p className="text-center text-xs text-ink-muted mt-5">Sejasa Home Team — Internal Admin Tool</p>
       </div>
     </main>
   );

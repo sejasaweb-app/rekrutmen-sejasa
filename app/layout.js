@@ -15,7 +15,7 @@ const sora = Sora({
 });
 
 export const metadata = {
-  title: "Dispatcher Sejasa — Daftar Jadi Mitra",
+  title: "Sejasa Home Team — Daftar Jadi Mitra",
   description: "Formulir pendaftaran mitra Sejasa untuk kategori Massage & Daily Cleaning",
 };
 

@@ -196,7 +196,7 @@ export default function ApplyPage() {
         <div className="mb-6">
           <Logo size={48} />
         </div>
-        <h1 className="font-display font-bold text-2xl mb-1">Daftar Jadi Mitra Dispatcher Sejasa</h1>
+        <h1 className="font-display font-bold text-2xl mb-1">Daftar Jadi Mitra Sejasa Home Team</h1>
         <p className="text-ink-muted mb-8">
           Isi data di bawah ini dengan lengkap dan benar.
         </p>

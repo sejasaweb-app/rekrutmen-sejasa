@@ -50,9 +50,9 @@ const BENEFITS = [
   },
 ];
 
-// Perbandingan Mitra Dispatcher vs Reguler — Dispatcher sengaja ditonjolkan
+// Perbandingan Mitra Sejasa Home Team vs Reguler — Home Team sengaja ditonjolkan
 // (border & background brand, poin lebih hidup) buat dorong konversi ke jalur ini.
-const DISPATCHER_POINTS = [
+const HOME_TEAM_POINTS = [
   { title: "Job Terjadwal Otomatis", desc: "Tinggal terima, gak perlu buka app terus buat rebutan orderan." },
   { title: "Area Sesuai Wilayah Jangkauan", desc: "Job selalu dekat dari lokasi kamu, hemat waktu & ongkos jalan." },
   { title: "Penghasilan Terjamin", desc: "Ada kepastian income tiap minggu, gak was-was sepi orderan." },
@@ -89,7 +89,7 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <Logo size={36} rounded="rounded-xl" />
-            <span className="font-display font-bold text-[15px] sm:text-lg tracking-tight">Dispatcher Sejasa</span>
+            <span className="font-display font-bold text-[15px] sm:text-lg tracking-tight">Sejasa Home Team</span>
           </div>
           <Link
             href="/apply"
@@ -115,7 +115,7 @@ export default function HomePage() {
         <div className="absolute top-32 -right-20 w-72 h-72 rounded-full bg-purple-400/10 blur-3xl -z-10" />
 
         <h1 className="font-display font-extrabold text-[2.1rem] leading-[1.1] sm:text-6xl sm:leading-[1.05] mb-4 sm:mb-5 max-w-2xl mx-auto tracking-tight pt-2 sm:pt-4">
-          Jadi Mitra <span className="text-brand">Dispatcher</span> Sejasa
+          Jadi Mitra Sejasa <span className="text-brand">Home Team</span>
         </h1>
         <p className="text-ink-muted text-base sm:text-lg max-w-lg mx-auto mb-7 sm:mb-9">
           Dapatkan pelanggan Massage & Daily Cleaning sesuai jangkauan wilayah kamu.
@@ -154,7 +154,7 @@ export default function HomePage() {
             </div>
             <span className="text-sm sm:text-base text-ink-muted text-left leading-snug">
               <span className="font-extrabold text-brand text-base sm:text-xl">5.000+</span>{" "}
-              Pekerjaan sudah diselesaikan oleh Mitra Dispatcher Sejasa
+              Pekerjaan sudah diselesaikan oleh Mitra Sejasa Home Team
             </span>
           </div>
         </div>
@@ -191,7 +191,7 @@ export default function HomePage() {
           <div className="text-center mb-7 sm:mb-12">
             <h2 className="font-display font-bold text-2xl sm:text-3xl mb-2 sm:mb-3 tracking-tight">Kenapa Gabung Jadi Mitra?</h2>
             <p className="text-ink-muted text-[15px] sm:text-base max-w-md mx-auto">
-              Beberapa keuntungan yang kamu dapat sebagai mitra Dispatcher Sejasa.
+              Beberapa keuntungan yang kamu dapat sebagai mitra Sejasa Home Team.
             </p>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 items-stretch">
@@ -218,17 +218,17 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Dispatcher vs Reguler */}
+      {/* Home Team vs Reguler */}
       <section className="px-4 sm:px-6 py-12 sm:py-20 bg-[#FAFAFA]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-7 sm:mb-12">
             <h2 className="font-display font-bold text-2xl sm:text-3xl tracking-tight">
-              Perbedaan Mitra <span className="text-brand">Dispatcher</span> dan Mitra{" "}
+              Perbedaan Mitra Sejasa <span className="text-brand">Home Team</span> dan Mitra{" "}
               <span className="text-gray-400">Reguler</span>
             </h2>
           </div>
           <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 items-start">
-            {/* Dispatcher — ditonjolkan */}
+            {/* Home Team — ditonjolkan */}
             <div
               className="relative rounded-card p-5 sm:p-7 bg-white border-2 shadow-xl"
               style={{ borderColor: "#E6007E" }}
@@ -240,10 +240,10 @@ export default function HomePage() {
                 <CalendarCheck size={22} className="text-white" />
               </div>
               <h3 className="font-display font-bold text-lg sm:text-xl mb-4 text-brand">
-                Mitra Dispatcher
+                Mitra Sejasa Home Team
               </h3>
               <ul className="space-y-3.5">
-                {DISPATCHER_POINTS.map((p) => (
+                {HOME_TEAM_POINTS.map((p) => (
                   <li key={p.title} className="flex gap-2.5">
                     <span
                       className="mt-0.5 shrink-0 w-5 h-5 rounded-full flex items-center justify-center"

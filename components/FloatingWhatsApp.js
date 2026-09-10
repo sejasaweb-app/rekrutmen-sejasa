@@ -6,7 +6,7 @@ import { X } from "lucide-react";
 import WhatsAppIcon from "./WhatsAppIcon";
 
 const WHATSAPP_NUMBER = "6285117246897";
-const DEFAULT_MESSAGE = "Halo, saya mau tanya soal pendaftaran Mitra Dispatcher Sejasa.";
+const DEFAULT_MESSAGE = "Halo, saya mau tanya soal pendaftaran Mitra Sejasa Home Team.";
 
 export default function FloatingWhatsApp() {
   const pathname = usePathname();
