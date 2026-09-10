@@ -344,9 +344,8 @@ export default function ApplicantDetailPage() {
               Alasan Pending <span className="text-red-500">*</span>
             </label>
             <p className="text-xs text-ink-muted mb-2">
-              Supaya jelas kenapa mitra ini berada di status Pending, bukan sekadar
-              menumpuk di Data Baru. Alasan ini memudahkan follow-up lagi begitu
-              kondisinya berubah.
+              Alasan ini menjelaskan kenapa mitra berstatus Pending, bukan Data Baru,
+              sehingga tim bisa melakukan follow-up saat kondisinya berubah.
             </p>
             <div className="relative mb-2">
               <select
