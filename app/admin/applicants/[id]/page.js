@@ -168,7 +168,7 @@ export default function ApplicantDetailPage() {
       await navigator.clipboard.writeText(signUrl);
       toast.success("Link tanda tangan disalin");
     } catch {
-      toast.error("Gagal menyalin link, coba lagi");
+      toast.error("Gagal menyalin link, silakan coba lagi.");
     }
   }
 
@@ -182,7 +182,7 @@ export default function ApplicantDetailPage() {
     const data = await res.json();
     setSavingLog(false);
     if (!res.ok) {
-      toast.error(data.error || "Gagal simpan follow-up");
+      toast.error(data.error || "Gagal menyimpan follow-up");
       return;
     }
     toast.success("Follow-up dicatat");
@@ -344,8 +344,9 @@ export default function ApplicantDetailPage() {
               Alasan Pending <span className="text-red-500">*</span>
             </label>
             <p className="text-xs text-ink-muted mb-2">
-              Biar ketauan kenapa mitra ini nyangkut di Pending, bukan cuma numpuk di Data Baru.
-              Nanti gampang di-follow-up lagi kalau kondisinya berubah.
+              Supaya jelas kenapa mitra ini berada di status Pending, bukan sekadar
+              menumpuk di Data Baru. Alasan ini memudahkan follow-up lagi begitu
+              kondisinya berubah.
             </p>
             <div className="relative mb-2">
               <select
@@ -364,7 +365,7 @@ export default function ApplicantDetailPage() {
                 className="input-field min-h-[70px]"
                 value={alasanPendingCustom}
                 onChange={(e) => setAlasanPendingCustom(e.target.value)}
-                placeholder="Tulis alasan pending-nya..."
+                placeholder="Tulis alasan Pending di sini..."
               />
             )}
           </div>

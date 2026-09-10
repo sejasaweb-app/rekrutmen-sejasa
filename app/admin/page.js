@@ -197,7 +197,7 @@ function AdminDashboardContent() {
   }
 
   async function handleDelete(id, nama) {
-    if (!window.confirm(`Hapus data "${nama}"? Data ini ga bisa dikembalikan lagi.`)) return;
+    if (!window.confirm(`Hapus data "${nama}"? Data ini tidak bisa dikembalikan lagi.`)) return;
     setDeletingId(id);
     try {
       const res = await fetch(`/api/applicants/${id}`, { method: "DELETE" });
@@ -206,7 +206,7 @@ function AdminDashboardContent() {
       toast.success("Data berhasil dihapus");
       refreshSummary();
     } catch {
-      toast.error("Gagal menghapus data, coba lagi ya");
+      toast.error("Gagal menghapus data, silakan coba lagi");
     } finally {
       setDeletingId(null);
     }
@@ -439,7 +439,7 @@ function AdminDashboardContent() {
                   <td colSpan={7} className="px-4 py-16 text-center">
                     <div className="text-ink-muted text-sm">
                       {q || status || kategori
-                        ? "Ga ada pendaftar yang cocok dengan filter ini."
+                        ? "Tidak ada pendaftar yang cocok dengan filter ini."
                         : "Belum ada pendaftar. Data bakal muncul di sini setelah ada yang isi form."}
                     </div>
                   </td>

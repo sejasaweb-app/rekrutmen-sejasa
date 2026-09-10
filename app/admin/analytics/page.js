@@ -177,7 +177,7 @@ export default function AnalyticsPage() {
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Export error:", err);
-      alert("Gagal export data. Coba lagi ya.");
+      alert("Gagal mengekspor data. Silakan coba lagi.");
     } finally {
       setExporting(false);
     }

@@ -191,7 +191,7 @@ export default function ApprovedMitraTable() {
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Export error:", err);
-      alert("Gagal export data. Coba lagi ya.");
+      alert("Gagal mengekspor data. Silakan coba lagi.");
     } finally {
       setExporting(false);
     }
@@ -328,7 +328,7 @@ export default function ApprovedMitraTable() {
                   <div className="flex flex-col items-center gap-2 text-ink-muted text-sm">
                     <CheckCircle2 size={20} className="text-gray-300" />
                     {q || kategori
-                      ? "Ga ada mitra diterima yang cocok dengan filter ini."
+                      ? "Tidak ada mitra diterima yang cocok dengan filter ini."
                       : "Belum ada mitra yang diterima di periode ini."}
                   </div>
                 </td>

@@ -38,7 +38,7 @@ export default function SettingsPage() {
       setMsgContract(data.settings.wa_message_contract || "");
       if (data.waUsage) setWaUsage(data.waUsage);
     } else {
-      toast.error(data.error || "Gagal ambil settingan");
+      toast.error(data.error || "Gagal mengambil pengaturan");
     }
     setLoading(false);
   }
@@ -64,11 +64,11 @@ export default function SettingsPage() {
     const data = await res.json();
     setSaving(false);
     if (!res.ok) {
-      toast.error(data.error || "Gagal simpan settingan");
+      toast.error(data.error || "Gagal menyimpan pengaturan");
       return;
     }
     if (data.waUsage) setWaUsage(data.waUsage);
-    toast.success("Settingan tersimpan");
+    toast.success("Pengaturan tersimpan");
   }
 
   const [activeTemplate, setActiveTemplate] = useState("diterima");
@@ -163,14 +163,14 @@ export default function SettingsPage() {
               <AlertTriangle size={14} className="mt-0.5 shrink-0" />
               <span>
                 Kuota bulan ini sudah habis — notifikasi WA otomatis berhenti terkirim sampai bulan
-                depan. Naikkan limit di bawah kalau paket Fonnte kamu sudah di-upgrade.
+                depan. Naikkan limit di bawah jika paket Fonnte sudah di-upgrade.
               </span>
             </div>
           )}
           {!isOverLimit && isNearLimit && (
             <div className="flex items-start gap-2 bg-amber-50 text-amber-700 text-xs rounded-lg p-3 mb-3">
               <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-              <span>Kuota WA bulan ini hampir habis, siap-siap kalau mau upgrade paket.</span>
+              <span>Kuota WA bulan ini hampir habis. Pertimbangkan untuk upgrade paket jika diperlukan.</span>
             </div>
           )}
 
