@@ -14,7 +14,13 @@ const initialForm = {
   punya_motor: "",
   punya_alat_cleaning: "", // khusus daily_cleaning
   melayani_gender: "", // khusus massage
+  jam_operasional: "",
 };
+
+const JAM_OPERASIONAL_OPTIONS = [
+  { value: "08:00-17:00", label: "08.00 – 17.00" },
+  { value: "09:00-18:00", label: "09.00 – 18.00" },
+];
 
 export default function ApplyPage() {
   const [form, setForm] = useState(initialForm);
@@ -81,6 +87,11 @@ export default function ApplyPage() {
 
     if (!form.nama || !form.email || !form.no_telp || !form.gender || !form.kategori || form.punya_motor === "") {
       toast.error("Lengkapi semua data dulu ya");
+      return;
+    }
+
+    if (!form.jam_operasional) {
+      toast.error("Pilih dulu jam operasional kamu ya");
       return;
     }
 
@@ -421,6 +432,30 @@ export default function ApplyPage() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1.5">Jam Operasional (Standby)</label>
+            <div className="flex gap-3">
+              {JAM_OPERASIONAL_OPTIONS.map((opt) => (
+                <button
+                  type="button"
+                  key={opt.value}
+                  onClick={() => updateField("jam_operasional", opt.value)}
+                  className={`flex-1 rounded-xl border px-4 py-3 text-sm font-medium transition ${
+                    form.jam_operasional === opt.value
+                      ? "border-brand bg-brand-light text-brand"
+                      : "border-gray-200 text-ink-muted"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-ink-muted mt-1.5">
+              Jam ini jadi acuan waktu standby kamu — kalau ada job yang masuk di jam
+              tersebut, wajib dikerjakan.
+            </p>
           </div>
 
           <div>

@@ -33,6 +33,7 @@ export async function POST(request) {
       foto_alat_url,
       foto_alat_name,
       melayani_gender,
+      jam_operasional,
       website, // honeypot — field ga kelihatan di UI, cuma bot yang biasanya ngisi ini
       form_rendered_at, // timestamp pas form pertama kali dibuka
     } = body;
@@ -55,6 +56,11 @@ export async function POST(request) {
 
     if (!nama || !email || !no_telp || !gender || !domisili || !kategori) {
       return NextResponse.json({ error: "Data belum lengkap" }, { status: 400 });
+    }
+
+    const JAM_OPERASIONAL_VALID = ["08:00-17:00", "09:00-18:00"];
+    if (!jam_operasional || !JAM_OPERASIONAL_VALID.includes(jam_operasional)) {
+      return NextResponse.json({ error: "Wajib pilih jam operasional" }, { status: 400 });
     }
 
     if (!file_url) {
@@ -151,6 +157,7 @@ export async function POST(request) {
           foto_alat_url: kategori === "daily_cleaning" ? foto_alat_url || null : null,
           foto_alat_name: kategori === "daily_cleaning" ? foto_alat_name || null : null,
           melayani_gender: kategori === "massage" ? melayani_gender : null,
+          jam_operasional,
         },
       ])
       .select()

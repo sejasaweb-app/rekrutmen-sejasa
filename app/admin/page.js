@@ -231,7 +231,7 @@ function AdminDashboardContent() {
   const paginated = sortedApplicants.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   function exportCsv() {
-    const headers = ["Nama", "Email", "No Telp", "Gender", "Domisili", "Kategori", "Punya Motor", "Status", "Tanggal Daftar"];
+    const headers = ["Nama", "Email", "No Telp", "Gender", "Domisili", "Kategori", "Punya Motor", "Jam Operasional", "Status", "Tanggal Daftar"];
     const rows = sortedApplicants.map((a) => [
       a.nama,
       a.email,
@@ -240,6 +240,7 @@ function AdminDashboardContent() {
       a.domisili,
       a.kategori.replace("_", " "),
       a.punya_motor ? "Ya" : "Tidak",
+      a.jam_operasional ? a.jam_operasional.replace("-", " – ") : "-",
       STATUS_META[a.status]?.label || a.status,
       new Date(a.created_at).toLocaleDateString("id-ID"),
     ]);

@@ -299,6 +299,10 @@ export default function ApplicantDetailPage() {
             value={new Date(applicant.created_at).toLocaleString("id-ID")}
           />
           <Field
+            label="Jam Operasional"
+            value={applicant.jam_operasional ? applicant.jam_operasional.replace("-", " – ") : "-"}
+          />
+          <Field
             label="Sertifikat/Paklaring"
             value={
               applicant.file_url ? (
