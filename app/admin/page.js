@@ -22,6 +22,7 @@ import {
   X,
   Bike,
   PauseCircle,
+  UserCircle2,
 } from "lucide-react";
 import StatusBadge, { STATUS_META } from "@/components/StatusBadge";
 
@@ -231,7 +232,7 @@ function AdminDashboardContent() {
   const paginated = sortedApplicants.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   function exportCsv() {
-    const headers = ["Nama", "Email", "No Telp", "Gender", "Domisili", "Kategori", "Punya Motor", "Jam Operasional", "Status", "Tanggal Daftar"];
+    const headers = ["Nama", "Email", "No Telp", "Gender", "Domisili", "Kategori", "Punya Motor", "Jam Operasional", "Status", "Diproses Oleh", "Tanggal Daftar"];
     const rows = sortedApplicants.map((a) => [
       a.nama,
       a.email,
@@ -242,6 +243,7 @@ function AdminDashboardContent() {
       a.punya_motor ? "Ya" : "Tidak",
       a.jam_operasional ? a.jam_operasional.replace("-", " – ") : "-",
       STATUS_META[a.status]?.label || a.status,
+      a.updated_by || "-",
       new Date(a.created_at).toLocaleDateString("id-ID"),
     ]);
 
@@ -428,6 +430,7 @@ function AdminDashboardContent() {
                 <th className="px-4 py-3 font-semibold">Domisili</th>
                 <th className="px-4 py-3 font-semibold">Motor</th>
                 <th className="px-4 py-3 font-semibold">Status</th>
+                <th className="px-4 py-3 font-semibold">Diproses Oleh</th>
                 <SortableHeader label="Tanggal" field="created_at" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                 <th className="px-4 py-3 font-semibold text-right">Aksi</th>
               </tr>
@@ -437,7 +440,7 @@ function AdminDashboardContent() {
                 Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)
               ) : applicants.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-16 text-center">
+                  <td colSpan={8} className="px-4 py-16 text-center">
                     <div className="text-ink-muted text-sm">
                       {q || status || kategori
                         ? "Tidak ada pendaftar yang cocok dengan filter ini."
@@ -477,6 +480,19 @@ function AdminDashboardContent() {
                         )}
                       </td>
                       <td className="px-4 py-3"><StatusBadge status={a.status} /></td>
+                      <td className="px-4 py-3">
+                        {a.updated_by ? (
+                          <span
+                            className="inline-flex items-center gap-1 text-xs text-ink-muted"
+                            title={a.updated_by}
+                          >
+                            <UserCircle2 size={13} className="text-gray-400" />
+                            {a.updated_by.split("@")[0]}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-300">-</span>
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-ink-muted">
                         {new Date(a.created_at).toLocaleDateString("id-ID")}
                       </td>
