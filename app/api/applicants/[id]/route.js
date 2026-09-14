@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseClient";
+import { getAdminUser } from "@/lib/adminAuth";
 import { sendWhatsAppNotification, renderTemplate } from "@/lib/fonnte";
 import { upsertApplicantRow } from "@/lib/googleSheets";
 import { generateAndSendContract } from "@/lib/contractService";
@@ -110,6 +111,32 @@ async function maybeAutoSendContract(supabase, applicant, newStatus) {
   }
 }
 
+// Isi kolom changed_by di baris status_history paling baru buat applicant ini
+// — trigger log_status_change() di DB yang bikin barisnya (cuma from/to
+// status), di sini kita tempelin siapa adminnya + catatannya. Fire-and-forget:
+// gagal isi audit trail TIDAK BOLEH menggagalkan update status yang utama.
+async function maybeTagStatusHistory(supabase, applicantId, adminEmail, note) {
+  if (!adminEmail) return;
+  try {
+    const { data: latest } = await supabase
+      .from("status_history")
+      .select("id")
+      .eq("applicant_id", applicantId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (latest) {
+      await supabase
+        .from("status_history")
+        .update({ changed_by: adminEmail, note: note || null })
+        .eq("id", latest.id);
+    }
+  } catch (err) {
+    console.error("Gagal tag status_history:", err);
+  }
+}
+
 export async function GET(request, { params }) {
   const supabase = supabaseAdmin();
   const { data, error } = await supabase
@@ -127,12 +154,14 @@ export async function PATCH(request, { params }) {
   try {
     const body = await request.json();
     const { status, catatan_admin, alasan_penolakan, alasan_pending } = body;
+    const adminUser = await getAdminUser(request);
 
     const updatePayload = {};
     if (status) updatePayload.status = status;
     if (catatan_admin !== undefined) updatePayload.catatan_admin = catatan_admin;
     if (alasan_penolakan !== undefined) updatePayload.alasan_penolakan = alasan_penolakan;
     if (alasan_pending !== undefined) updatePayload.alasan_pending = alasan_pending;
+    updatePayload.updated_by = adminUser?.email || null;
 
     const supabase = supabaseAdmin();
     const { data: before } = await supabase
@@ -153,6 +182,7 @@ export async function PATCH(request, { params }) {
     // Kirim notifikasi WA cuma kalau status BERUBAH ke approved/rejected
     // (bukan cuma save catatan, dan bukan klik status yang sama lagi).
     if (status && status !== before?.status) {
+      await maybeTagStatusHistory(supabase, params.id, adminUser?.email, catatan_admin);
       await maybeSendStatusNotification(supabase, data, status);
       await maybeAutoSendContract(supabase, data, status);
     }

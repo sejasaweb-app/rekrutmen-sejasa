@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import { ArrowLeft, FileText, Clock, MessageCircle, Phone, Mail, MoreHorizontal, FileSignature, ExternalLink, Copy, ChevronDown } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
+import { adminFetch } from "@/lib/adminFetch";
 
 const STATUS_FLOW = ["data_baru", "pending", "screening", "onboarding", "approved", "rejected"];
 const STATUS_LABELS = {
@@ -126,7 +127,7 @@ export default function ApplicantDetailPage() {
         alasanPendingPreset === "Lainnya" ? alasanPendingCustom.trim() : alasanPendingPreset;
     }
 
-    const res = await fetch(`/api/applicants/${id}`, {
+    const res = await adminFetch(`/api/applicants/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -174,7 +175,7 @@ export default function ApplicantDetailPage() {
 
   async function addLog() {
     setSavingLog(true);
-    const res = await fetch(`/api/applicants/${id}/contact-logs`, {
+    const res = await adminFetch(`/api/applicants/${id}/contact-logs`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ channel, response, catatan: logCatatan }),
@@ -302,6 +303,9 @@ export default function ApplicantDetailPage() {
             label="Jam Operasional"
             value={applicant.jam_operasional ? applicant.jam_operasional.replace("-", " – ") : "-"}
           />
+          {applicant.updated_by && (
+            <Field label="Terakhir Diupdate Oleh" value={applicant.updated_by} />
+          )}
           <Field
             label="Sertifikat/Paklaring"
             value={
@@ -588,6 +592,7 @@ export default function ApplicantDetailPage() {
                     {log.catatan && <p className="text-sm text-ink-muted mt-0.5">{log.catatan}</p>}
                     <p className="text-xs text-ink-muted mt-1">
                       {new Date(log.created_at).toLocaleString("id-ID")}
+                      {log.created_by && ` · oleh ${log.created_by}`}
                     </p>
                   </div>
                 </li>
@@ -619,6 +624,7 @@ export default function ApplicantDetailPage() {
                 </div>
                 <p className="text-xs text-ink-muted mt-1">
                   {new Date(h.created_at).toLocaleString("id-ID")}
+                  {h.changed_by && ` · oleh ${h.changed_by}`}
                 </p>
               </li>
             ))}
