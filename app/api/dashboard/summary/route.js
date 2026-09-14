@@ -11,15 +11,17 @@ export const fetchCache = "force-no-store";
 export async function GET() {
   try {
     const supabase = supabaseAdmin();
-    const { data, error } = await supabase.from("applicants").select("status, kategori");
+    const { data, error } = await supabase.from("applicants").select("status, kategori, updated_by");
     if (error) throw error;
 
     const byStatus = {};
     const byKategori = {};
+    const processedBySet = new Set();
 
     for (const row of data) {
       byStatus[row.status] = (byStatus[row.status] || 0) + 1;
       byKategori[row.kategori] = (byKategori[row.kategori] || 0) + 1;
+      if (row.updated_by) processedBySet.add(row.updated_by);
     }
 
     return NextResponse.json(
@@ -27,6 +29,7 @@ export async function GET() {
         total: data.length,
         byStatus,
         byKategori,
+        processedByOptions: Array.from(processedBySet).sort(),
       },
       {
         headers: {
