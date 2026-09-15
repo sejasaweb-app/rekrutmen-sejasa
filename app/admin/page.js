@@ -331,7 +331,7 @@ function AdminDashboardContent() {
       </div>
 
       {/* Funnel chart */}
-      <div className="card p-5 mb-6 hover:shadow-lg transition-shadow duration-200">
+      <div className="card p-5 mb-6 hover:shadow-card-lg transition-shadow duration-200">
         <h2 className="font-display text-sm font-semibold mb-5">Funnel Status</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
           {FUNNEL_STEPS.map((step) => {
@@ -352,7 +352,7 @@ function AdminDashboardContent() {
                   <span className="text-sm font-semibold tabular-nums">
                     {value}
                     {funnelTotal > 0 && (
-                      <span className="text-xs text-ink-muted font-normal ml-1.5">({Math.round(pct)}%)</span>
+                      <span className="text-xs text-ink-muted font-normal ml-1.5 tabular-nums">({Math.round(pct)}%)</span>
                     )}
                   </span>
                 </div>
@@ -650,16 +650,16 @@ function SummaryCard({ icon: Icon, label, value, accent, highlight, onClick }) {
     return (
       <Tag
         {...clickableProps}
-        className={`card p-5 text-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 text-left w-full ${onClick ? "cursor-pointer" : ""}`}
-        style={{ backgroundColor: accent }}
+        className={`card p-5 text-white hover:shadow-card-lg hover:-translate-y-0.5 transition-all duration-200 text-left w-full border-transparent ${onClick ? "cursor-pointer" : ""}`}
+        style={{ background: `linear-gradient(135deg, #F0169B, ${accent === "#E6007E" ? "#8A0049" : accent})` }}
       >
-        <div className="flex items-center justify-between mb-4">
-          <div className="text-[11px] uppercase tracking-wide text-white/75 font-medium">{label}</div>
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+        <div className="flex items-center justify-between mb-5">
+          <div className="text-[13px] text-white/80 font-medium">{label}</div>
+          <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center">
             <Icon size={15} className="text-white" />
           </div>
         </div>
-        <div className="text-3xl font-bold tracking-tight">{value}</div>
+        <div className="text-3xl font-bold tracking-tight tabular-nums">{value}</div>
       </Tag>
     );
   }
@@ -667,10 +667,10 @@ function SummaryCard({ icon: Icon, label, value, accent, highlight, onClick }) {
   return (
     <Tag
       {...clickableProps}
-      className={`card p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 text-left w-full ${onClick ? "cursor-pointer" : ""}`}
+      className={`card p-5 hover:shadow-card-lg hover:-translate-y-0.5 transition-all duration-200 text-left w-full ${onClick ? "cursor-pointer" : ""}`}
     >
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-[11px] uppercase tracking-wide text-gray-400 font-medium">{label}</div>
+      <div className="flex items-center justify-between mb-5">
+        <div className="text-[13px] text-ink-muted font-medium">{label}</div>
         <div
           className="w-8 h-8 rounded-full flex items-center justify-center"
           style={{ backgroundColor: `${accent}1A` }}
@@ -678,7 +678,7 @@ function SummaryCard({ icon: Icon, label, value, accent, highlight, onClick }) {
           <Icon size={15} style={{ color: accent }} />
         </div>
       </div>
-      <div className="text-3xl font-bold tracking-tight">{value}</div>
+      <div className="text-3xl font-bold tracking-tight tabular-nums">{value}</div>
     </Tag>
   );
 }

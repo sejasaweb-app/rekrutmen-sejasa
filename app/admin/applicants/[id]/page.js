@@ -221,11 +221,11 @@ export default function ApplicantDetailPage() {
       <div className="card p-6 mb-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-brand-light text-brand flex items-center justify-center font-semibold shrink-0">
+            <div className="w-11 h-11 rounded-full bg-brand-light text-brand flex items-center justify-center font-semibold shrink-0 ring-1 ring-brand/10">
               {applicant.nama.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="text-xl font-bold">{applicant.nama}</h1>
+              <h1 className="font-display text-xl font-bold tracking-tight">{applicant.nama}</h1>
               <div className="flex items-center gap-2 flex-wrap mt-0.5">
                 <p className="text-ink-muted text-sm">{applicant.email} · {applicant.no_telp}</p>
                 {toWhatsAppLink(applicant.no_telp) && (

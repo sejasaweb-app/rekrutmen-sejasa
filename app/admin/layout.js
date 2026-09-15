@@ -43,7 +43,7 @@ export default function AdminLayout({ children }) {
   if (isLoginPage) return children;
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="w-6 h-6 border-2 border-gray-200 border-t-brand rounded-full animate-spin" />
       </div>
     );
@@ -52,13 +52,15 @@ export default function AdminLayout({ children }) {
   const initial = adminEmail.charAt(0).toUpperCase();
 
   return (
-    <div className="min-h-screen flex bg-[#FAFAFA]">
+    <div className="min-h-screen flex bg-gray-50">
       <aside className="w-64 bg-white border-r border-gray-100 flex flex-col py-5 px-3">
-        <div className="flex items-center gap-2.5 mb-9 px-2.5">
+        <div className="flex items-center gap-2.5 mb-8 px-2.5">
           <Logo size={36} rounded="rounded-xl" />
           <div>
-            <div className="font-semibold text-sm leading-tight">Rekrutmen Sejasa Home Team</div>
-            <div className="text-[11px] text-ink-muted leading-tight">Admin Panel</div>
+            <div className="font-display font-bold text-[14px] leading-tight tracking-tight">
+              Rekrutmen Sejasa Home Team
+            </div>
+            <div className="text-[11px] text-ink-muted leading-tight mt-0.5">Admin Panel</div>
           </div>
         </div>
 
@@ -73,14 +75,13 @@ export default function AdminLayout({ children }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-                  active ? "text-brand bg-brand-light" : "text-ink-muted hover:bg-gray-50 hover:text-ink"
+                className={`relative flex items-center gap-2.5 rounded-control px-3 py-2.5 text-sm font-medium transition ${
+                  active ? "text-brand bg-brand/[0.07]" : "text-ink-muted hover:bg-gray-50 hover:text-ink"
                 }`}
               >
                 {active && (
                   <span
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full"
-                    style={{ backgroundColor: "#E6007E" }}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-brand"
                   />
                 )}
                 <Icon size={17} strokeWidth={active ? 2.4 : 2} />
@@ -92,8 +93,8 @@ export default function AdminLayout({ children }) {
         </nav>
 
         <div className="border-t border-gray-100 pt-3 mt-3">
-          <div className="flex items-center gap-2.5 px-2.5 py-2 mb-1 rounded-lg">
-            <div className="w-8 h-8 rounded-full bg-gray-100 text-ink-muted flex items-center justify-center text-xs font-semibold shrink-0">
+          <div className="flex items-center gap-2.5 px-2.5 py-2 mb-1 rounded-control bg-gray-50/60">
+            <div className="w-8 h-8 rounded-full bg-white ring-1 ring-gray-200 text-ink-muted flex items-center justify-center text-xs font-semibold shrink-0">
               {initial}
             </div>
             <div className="min-w-0">
@@ -103,7 +104,7 @@ export default function AdminLayout({ children }) {
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2.5 w-full text-sm text-ink-muted hover:text-red-600 hover:bg-red-50 rounded-lg px-3 py-2 transition"
+            className="flex items-center gap-2.5 w-full text-sm text-ink-muted hover:text-red-600 hover:bg-red-50 rounded-control px-3 py-2 transition"
           >
             <LogOut size={16} />
             Keluar

@@ -326,7 +326,7 @@ export default function AnalyticsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Funnel conversion */}
-        <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
+        <div className="card p-5 hover:shadow-card-lg transition-shadow duration-200">
           <h2 className="font-display text-sm font-semibold mb-4">Funnel Konversi</h2>
           <p className="text-xs text-ink-muted mb-4">Jumlah pelamar yang berhasil mencapai setiap tahap seleksi.</p>
           <div className="space-y-3.5">
@@ -369,7 +369,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Trend chart */}
-        <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
+        <div className="card p-5 hover:shadow-card-lg transition-shadow duration-200">
           <h2 className="font-display text-sm font-semibold mb-1">Tren Pendaftaran</h2>
           <p className="text-xs text-ink-muted mb-4">
             {rangeLabel}
@@ -383,7 +383,7 @@ export default function AnalyticsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Top kota */}
-        <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
+        <div className="card p-5 hover:shadow-card-lg transition-shadow duration-200">
           <div className="flex items-center gap-2 mb-4">
             <MapPin size={16} className="text-ink-muted" />
             <h2 className="font-display text-sm font-semibold">Top Kota</h2>
@@ -411,7 +411,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Distribusi kategori */}
-        <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
+        <div className="card p-5 hover:shadow-card-lg transition-shadow duration-200">
           <div className="flex items-center gap-2 mb-4">
             <Tags size={16} className="text-ink-muted" />
             <h2 className="font-display text-sm font-semibold">Distribusi Kategori</h2>
@@ -445,7 +445,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Follow-up breakdown */}
-        <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
+        <div className="card p-5 hover:shadow-card-lg transition-shadow duration-200">
           <div className="flex items-center gap-2 mb-4">
             <MessageCircle size={16} className="text-ink-muted" />
             <h2 className="font-display text-sm font-semibold">Hasil Follow-up</h2>
@@ -555,7 +555,7 @@ function formatShortDate(dateStr) {
 
 function StatCard({ icon: Icon, label, value, sub, accent, delta }) {
   return (
-    <div className="card p-5 hover:shadow-lg transition-shadow duration-200">
+    <div className="card p-5 hover:shadow-card-lg transition-shadow duration-200">
       <div className="flex items-center justify-between mb-4">
         <div className="text-[11px] uppercase tracking-wide text-gray-400 font-medium">{label}</div>
         <div
