@@ -57,8 +57,8 @@ export default function AdminLayout({ children }) {
         <div className="flex items-center gap-2.5 mb-8 px-2.5">
           <Logo size={36} rounded="rounded-xl" />
           <div>
-            <div className="font-display font-bold text-[14px] leading-tight tracking-tight">
-              Rekrutmen Sejasa Home Team
+            <div className="font-display font-bold text-[15px] leading-tight tracking-tight">
+              Sejasa Home Team
             </div>
             <div className="text-[11px] text-ink-muted leading-tight mt-0.5">Admin Panel</div>
           </div>

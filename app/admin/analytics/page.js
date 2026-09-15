@@ -244,7 +244,7 @@ export default function AnalyticsPage() {
             </div>
 
             {showCustomPanel && (
-              <div className="absolute right-0 top-[calc(100%+8px)] z-20 w-72 card p-4 shadow-lg">
+              <div className="absolute right-0 top-[calc(100%+8px)] z-20 w-72 card p-4 shadow-card-lg">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-semibold">Pilih tanggal</span>
                   <button onClick={() => setShowCustomPanel(false)} className="text-ink-muted hover:text-ink">
@@ -298,7 +298,7 @@ export default function AnalyticsPage() {
 
       {/* Top stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard icon={Users} label="Total Pendaftar" value={data.total} accent="#E6007E" delta={totalDelta} />
+        <StatCard icon={Users} label="Total Pendaftar" value={data.total} accent="#E6007E" delta={totalDelta} highlight />
         <StatCard
           icon={TrendingUp}
           label="Tingkat Diterima"
@@ -553,11 +553,36 @@ function formatShortDate(dateStr) {
   return d.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
 }
 
-function StatCard({ icon: Icon, label, value, sub, accent, delta }) {
+function StatCard({ icon: Icon, label, value, sub, accent, delta, highlight }) {
+  if (highlight) {
+    return (
+      <div className="card p-5 text-white hover:shadow-card-lg transition-shadow duration-200 border-transparent" style={{ background: "linear-gradient(135deg, #F0169B, #8A0049)" }}>
+        <div className="flex items-center justify-between mb-5">
+          <div className="text-[13px] text-white/80 font-medium">{label}</div>
+          <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center">
+            <Icon size={15} className="text-white" />
+          </div>
+        </div>
+        <div className="flex items-end gap-2 flex-wrap">
+          <div className="text-3xl font-bold tracking-tight tabular-nums">{value}</div>
+          {delta && (
+            <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold mb-1 text-white/90">
+              {delta.label !== "Baru" &&
+                (delta.positive ? <ArrowUpRight size={11} /> : <ArrowDownRight size={11} />)}
+              {delta.label}
+            </span>
+          )}
+        </div>
+        {sub && <div className="text-xs text-white/70 mt-1.5">{sub}</div>}
+        {delta && <div className="text-[10px] text-white/60 mt-0.5">vs periode sebelumnya</div>}
+      </div>
+    );
+  }
+
   return (
     <div className="card p-5 hover:shadow-card-lg transition-shadow duration-200">
-      <div className="flex items-center justify-between mb-4">
-        <div className="text-[11px] uppercase tracking-wide text-gray-400 font-medium">{label}</div>
+      <div className="flex items-center justify-between mb-5">
+        <div className="text-[13px] text-ink-muted font-medium">{label}</div>
         <div
           className="w-8 h-8 rounded-full flex items-center justify-center"
           style={{ backgroundColor: `${accent}1A` }}
@@ -566,7 +591,7 @@ function StatCard({ icon: Icon, label, value, sub, accent, delta }) {
         </div>
       </div>
       <div className="flex items-end gap-2 flex-wrap">
-        <div className="text-3xl font-bold tracking-tight">{value}</div>
+        <div className="text-3xl font-bold tracking-tight tabular-nums">{value}</div>
         {delta && (
           <span
             className={`inline-flex items-center gap-0.5 text-[11px] font-semibold mb-1 ${

@@ -227,7 +227,7 @@ export default function ApprovedMitraTable() {
             </div>
 
             {showCustomPanel && (
-              <div className="absolute right-0 top-[calc(100%+8px)] z-20 w-72 card p-4 shadow-lg">
+              <div className="absolute right-0 top-[calc(100%+8px)] z-20 w-72 card p-4 shadow-card-lg">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm font-semibold">Pilih tanggal diterima</span>
                   <button onClick={() => setShowCustomPanel(false)} className="text-ink-muted hover:text-ink">
