@@ -137,12 +137,12 @@ export default function SettingsPage() {
           </div>
 
           <div className="flex items-end justify-between mb-1.5">
-            <span className="text-xl font-bold">
+            <span className="text-xl font-bold tabular-nums">
               {waUsage.count}
               <span className="text-sm font-normal text-ink-muted"> / {monthlyLimit}</span>
             </span>
             <span
-              className={`text-xs font-medium ${
+              className={`text-xs font-medium tabular-nums ${
                 isOverLimit ? "text-red-600" : isNearLimit ? "text-amber-600" : "text-ink-muted"
               }`}
             >

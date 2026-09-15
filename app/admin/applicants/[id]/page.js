@@ -417,7 +417,7 @@ export default function ApplicantDetailPage() {
         <div className="card p-6 mb-6">
           <div className="flex items-center gap-2 mb-1">
             <FileSignature size={16} className="text-purple-600" />
-            <h2 className="text-sm font-semibold">Kontrak Kemitraan</h2>
+            <h2 className="font-display text-sm font-semibold">Kontrak Kemitraan</h2>
           </div>
 
           {applicant.contract_status === "ditandatangani" ? (
@@ -494,7 +494,7 @@ export default function ApplicantDetailPage() {
       <div className="card p-6 mb-6">
         <div className="flex items-center gap-2 mb-1">
           <MessageCircle size={16} className="text-ink-muted" />
-          <h2 className="text-sm font-semibold">Riwayat Follow-up</h2>
+          <h2 className="font-display text-sm font-semibold">Riwayat Follow-up</h2>
         </div>
         <p className="text-xs text-ink-muted mb-4">
           Catat hasil komunikasi (WA/telepon/dll) sebelum mengubah status lamaran.
@@ -607,7 +607,7 @@ export default function ApplicantDetailPage() {
         <div className="card p-6">
           <div className="flex items-center gap-2 mb-4">
             <Clock size={16} className="text-ink-muted" />
-            <h2 className="text-sm font-semibold">Riwayat Status</h2>
+            <h2 className="font-display text-sm font-semibold">Riwayat Status</h2>
           </div>
           <ol className="relative border-l border-gray-200 ml-1.5 space-y-5">
             {history.map((h) => (
