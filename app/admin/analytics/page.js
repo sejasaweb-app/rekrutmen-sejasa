@@ -69,17 +69,15 @@ function getClientPeriodBounds(range, customFrom, customTo) {
   return { start, end: now };
 }
 
-// Delta buat metrik hitungan (total pendaftar, total follow-up) -> persentase perubahan.
+// Delta buat metrik hitungan (total pendaftar, total follow-up) -> selisih
+// angka asli (bukan persentase). Di skala puluhan/ratusan gini, persentase
+// terhadap angka kecil bisa keliatan ekstrem (mis. 1 jadi 6 = "+500%")
+// padahal cuma naik 5 — selisih angka lebih jujur dan gampang dicerna sekilas.
 function countDelta(current, previous) {
   if (previous === null || previous === undefined) return null;
-  if (previous === 0) {
-    if (!current) return null;
-    return { label: "Baru", positive: true };
-  }
   const diff = current - previous;
-  const pct = Math.round((diff / previous) * 100);
-  if (pct === 0) return null;
-  return { label: `${diff >= 0 ? "+" : ""}${pct}%`, positive: diff >= 0 };
+  if (diff === 0) return null;
+  return { label: `${diff >= 0 ? "+" : ""}${diff}`, positive: diff >= 0 };
 }
 
 // Delta buat metrik yang lebih pas dibandingin sebagai selisih poin (rate %, hari).
