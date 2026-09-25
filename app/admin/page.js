@@ -67,6 +67,12 @@ const KATEGORI_OPTIONS = [
   { value: "daily_cleaning", label: "Daily Cleaning" },
 ];
 
+const GENDER_OPTIONS = [
+  { value: "", label: "Semua Gender" },
+  { value: "male", label: "Laki-laki" },
+  { value: "female", label: "Perempuan" },
+];
+
 const KATEGORI_STYLES = {
   massage: { label: "Massage", classes: "bg-brand-light text-brand" },
   daily_cleaning: { label: "Daily Cleaning", classes: "bg-teal-100 text-teal-700" },
@@ -101,6 +107,8 @@ function AdminDashboardContent() {
   // (filter, pencarian, halaman, dan jumlah baris per halaman) bukan ke default.
   const [status, setStatus] = useState(searchParams.get("status") || "");
   const [kategori, setKategori] = useState(searchParams.get("kategori") || "");
+  const [gender, setGender] = useState(searchParams.get("gender") || "");
+  const [kota, setKota] = useState(searchParams.get("kota") || "");
   const [diprosesOleh, setDiprosesOleh] = useState(searchParams.get("diproses_oleh") || "");
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
@@ -119,6 +127,8 @@ function AdminDashboardContent() {
     const params = new URLSearchParams();
     if (status) params.set("status", status);
     if (kategori) params.set("kategori", kategori);
+    if (gender) params.set("gender", gender);
+    if (kota) params.set("kota", kota);
     if (diprosesOleh) params.set("diproses_oleh", diprosesOleh);
     if (q) params.set("q", q);
 
@@ -133,7 +143,7 @@ function AdminDashboardContent() {
     setApplicants(listData.applicants || []);
     setLoading(false);
     setLastUpdated(new Date());
-  }, [status, kategori, diprosesOleh, q]);
+  }, [status, kategori, gender, kota, diprosesOleh, q]);
 
   // Tombol refresh manual — dipisah dari `loading` (yang juga dipakai skeleton awal)
   // biar animasi ikon berputar cuma jelas kelihatan pas user sengaja klik refresh.
@@ -167,7 +177,7 @@ function AdminDashboardContent() {
       return;
     }
     setPage(1);
-  }, [status, kategori, diprosesOleh, q, pageSize]);
+  }, [status, kategori, gender, kota, diprosesOleh, q, pageSize]);
 
   // Simpan kombinasi filter/halaman ke URL (replace, ga nambah history baru)
   // biar tombol back browser dari halaman detail balik ke state list yang sama.
@@ -175,20 +185,24 @@ function AdminDashboardContent() {
     const params = new URLSearchParams();
     if (status) params.set("status", status);
     if (kategori) params.set("kategori", kategori);
+    if (gender) params.set("gender", gender);
+    if (kota) params.set("kota", kota);
     if (diprosesOleh) params.set("diproses_oleh", diprosesOleh);
     if (q) params.set("q", q);
     if (page > 1) params.set("page", String(page));
     if (pageSize !== PAGE_SIZE_OPTIONS[0]) params.set("pageSize", String(pageSize));
     const qs = params.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [status, kategori, diprosesOleh, page, pageSize, pathname, router, q]);
+  }, [status, kategori, gender, kota, diprosesOleh, page, pageSize, pathname, router, q]);
 
-  const hasActiveFilters = Boolean(q || status || kategori || diprosesOleh);
+  const hasActiveFilters = Boolean(q || status || kategori || gender || kota || diprosesOleh);
 
   function resetFilters() {
     setQ("");
     setStatus("");
     setKategori("");
+    setGender("");
+    setKota("");
     setDiprosesOleh("");
   }
 
@@ -408,6 +422,31 @@ function AdminDashboardContent() {
           >
             {KATEGORI_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+        </div>
+        <div className="relative">
+          <select
+            className="input-field appearance-none pr-9 max-w-[160px] cursor-pointer"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+          >
+            {GENDER_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+        </div>
+        <div className="relative">
+          <select
+            className="input-field appearance-none pr-9 max-w-[180px] cursor-pointer"
+            value={kota}
+            onChange={(e) => setKota(e.target.value)}
+          >
+            <option value="">Semua Kota</option>
+            {(summary?.kotaOptions || []).map((k) => (
+              <option key={k} value={k}>{k}</option>
             ))}
           </select>
           <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />

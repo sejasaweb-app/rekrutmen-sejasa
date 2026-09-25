@@ -175,13 +175,16 @@ export async function POST(request) {
 }
 
 // GET — list applicants buat dashboard admin, support filter & search
-// query params: status, kategori, q (cari nama/email/telp)
+// query params: status, kategori, gender, kota, q (cari nama/email/telp), diproses_oleh
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const kategori = searchParams.get("kategori");
+    const gender = searchParams.get("gender");
+    const kota = searchParams.get("kota");
     const q = searchParams.get("q");
+    const diprosesOleh = searchParams.get("diproses_oleh");
 
     const supabase = supabaseAdmin();
     let query = supabase
@@ -191,7 +194,14 @@ export async function GET(request) {
 
     if (status) query = query.eq("status", status);
     if (kategori) query = query.eq("kategori", kategori);
+    if (gender) query = query.eq("gender", gender);
+    // domisili disimpan sebagai "Kecamatan, Kota" bebas teks (bukan kolom kota
+    // terpisah), jadi filter kota dicocokkan sebagai substring — konsisten
+    // dengan cara "Top Kota" di halaman Performa mengekstrak nama kota.
+    if (kota) query = query.ilike("domisili", `%${kota}%`);
     if (q) query = query.or(`nama.ilike.%${q}%,email.ilike.%${q}%,no_telp.ilike.%${q}%`);
+    if (diprosesOleh === "__belum__") query = query.is("updated_by", null);
+    else if (diprosesOleh) query = query.eq("updated_by", diprosesOleh);
 
     const { data, error } = await query;
     if (error) throw error;
