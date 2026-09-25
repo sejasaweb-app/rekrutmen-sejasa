@@ -18,9 +18,9 @@ const initialForm = {
 };
 
 const JAM_OPERASIONAL_OPTIONS = [
-  { value: "08:00-17:00", label: "08.00 – 17.00" },
-  { value: "09:00-18:00", label: "09.00 – 18.00" },
-  { value: "12:00-21:00", label: "12.00 – 21.00" },
+  { value: "08:00-17:00", label: "08.00 – 17.00", tag: "Pagi – Sore" },
+  { value: "09:00-18:00", label: "09.00 – 18.00", tag: "Pagi – Sore" },
+  { value: "12:00-21:00", label: "12.00 – 21.00", tag: "Siang – Malam" },
 ];
 
 export default function ApplyPage() {
@@ -443,13 +443,20 @@ export default function ApplyPage() {
                   type="button"
                   key={opt.value}
                   onClick={() => updateField("jam_operasional", opt.value)}
-                  className={`rounded-xl border px-2 py-3 text-[13px] leading-snug font-medium text-center transition ${
+                  className={`rounded-xl border px-2 py-2.5 text-[13px] leading-snug font-medium text-center transition ${
                     form.jam_operasional === opt.value
                       ? "border-brand bg-brand-light text-brand"
                       : "border-gray-200 text-ink-muted"
                   }`}
                 >
                   {opt.label}
+                  <span
+                    className={`block text-[11px] font-normal mt-0.5 ${
+                      form.jam_operasional === opt.value ? "text-brand/70" : "text-gray-400"
+                    }`}
+                  >
+                    {opt.tag}
+                  </span>
                 </button>
               ))}
             </div>
