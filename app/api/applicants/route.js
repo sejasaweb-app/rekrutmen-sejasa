@@ -58,7 +58,7 @@ export async function POST(request) {
       return NextResponse.json({ error: "Data belum lengkap" }, { status: 400 });
     }
 
-    const JAM_OPERASIONAL_VALID = ["08:00-17:00", "09:00-18:00"];
+    const JAM_OPERASIONAL_VALID = ["08:00-17:00", "09:00-18:00", "12:00-21:00"];
     if (!jam_operasional || !JAM_OPERASIONAL_VALID.includes(jam_operasional)) {
       return NextResponse.json({ error: "Wajib pilih jam operasional" }, { status: 400 });
     }
@@ -175,14 +175,13 @@ export async function POST(request) {
 }
 
 // GET — list applicants buat dashboard admin, support filter & search
-// query params: status, kategori, q (cari nama/email/telp), diproses_oleh
+// query params: status, kategori, q (cari nama/email/telp)
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const kategori = searchParams.get("kategori");
     const q = searchParams.get("q");
-    const diprosesOleh = searchParams.get("diproses_oleh");
 
     const supabase = supabaseAdmin();
     let query = supabase
@@ -193,8 +192,6 @@ export async function GET(request) {
     if (status) query = query.eq("status", status);
     if (kategori) query = query.eq("kategori", kategori);
     if (q) query = query.or(`nama.ilike.%${q}%,email.ilike.%${q}%,no_telp.ilike.%${q}%`);
-    if (diprosesOleh === "__belum__") query = query.is("updated_by", null);
-    else if (diprosesOleh) query = query.eq("updated_by", diprosesOleh);
 
     const { data, error } = await query;
     if (error) throw error;

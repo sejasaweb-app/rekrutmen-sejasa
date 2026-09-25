@@ -20,6 +20,7 @@ const initialForm = {
 const JAM_OPERASIONAL_OPTIONS = [
   { value: "08:00-17:00", label: "08.00 – 17.00" },
   { value: "09:00-18:00", label: "09.00 – 18.00" },
+  { value: "12:00-21:00", label: "12.00 – 21.00" },
 ];
 
 export default function ApplyPage() {
@@ -436,13 +437,13 @@ export default function ApplyPage() {
 
           <div>
             <label className="block text-sm font-medium mb-1.5">Jam Operasional (Standby)</label>
-            <div className="flex gap-3">
+            <div className="grid grid-cols-3 gap-2">
               {JAM_OPERASIONAL_OPTIONS.map((opt) => (
                 <button
                   type="button"
                   key={opt.value}
                   onClick={() => updateField("jam_operasional", opt.value)}
-                  className={`flex-1 rounded-xl border px-4 py-3 text-sm font-medium transition ${
+                  className={`rounded-xl border px-2 py-3 text-[13px] leading-snug font-medium text-center transition ${
                     form.jam_operasional === opt.value
                       ? "border-brand bg-brand-light text-brand"
                       : "border-gray-200 text-ink-muted"
