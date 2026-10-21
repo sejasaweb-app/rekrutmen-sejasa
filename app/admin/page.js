@@ -74,7 +74,7 @@ const GENDER_OPTIONS = [
 ];
 
 const SUMBER_INFO_OPTIONS = [
-  { value: "", label: "Semua Sumber Info" },
+  { value: "", label: "Semua Sumber" },
   { value: "whatsapp", label: "WhatsApp" },
   { value: "facebook", label: "Facebook" },
   { value: "teman", label: "Teman" },
@@ -89,7 +89,7 @@ const SUMBER_INFO_LABELS = {
 };
 
 const PUNYA_ALAT_OPTIONS = [
-  { value: "", label: "Semua (Alat Cleaning)" },
+  { value: "", label: "Semua Alat" },
   { value: "ya", label: "Punya Alat" },
   { value: "tidak", label: "Tidak Punya Alat" },
 ];
@@ -416,121 +416,77 @@ function AdminDashboardContent() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative max-w-xs flex-1 min-w-[200px]">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
-          <input
-            className="input-field pl-10"
-            placeholder="Cari nama, email, atau no. telp"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-          />
-          {q && (
+      <div className="mb-4 space-y-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative flex-1 min-w-[240px] max-w-md">
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+            <input
+              className="input-field pl-10"
+              placeholder="Cari nama, email, atau no. telp"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+            />
+            {q && (
+              <button
+                onClick={() => setQ("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink"
+                title="Bersihkan pencarian"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+          {hasActiveFilters && (
             <button
-              onClick={() => setQ("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-muted hover:text-ink"
-              title="Bersihkan pencarian"
+              onClick={resetFilters}
+              className="flex items-center gap-1 text-xs font-medium text-ink-muted hover:text-brand transition px-2 py-1.5"
             >
-              <X size={14} />
+              <X size={13} />
+              Reset filter
             </button>
           )}
         </div>
-        <div className="relative">
-          <select
-            className="input-field appearance-none pr-9 max-w-[180px] cursor-pointer"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
+
+        <div className="grid grid-cols-2 md:grid-cols-4 2xl:grid-cols-7 gap-3">
+          <FilterSelect label="Status" value={status} onChange={setStatus}>
             {STATUS_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
-          </select>
-          <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
-        </div>
-        <div className="relative">
-          <select
-            className="input-field appearance-none pr-9 max-w-[180px] cursor-pointer"
-            value={kategori}
-            onChange={(e) => setKategori(e.target.value)}
-          >
+          </FilterSelect>
+          <FilterSelect label="Kategori" value={kategori} onChange={setKategori}>
             {KATEGORI_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
-          </select>
-          <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
-        </div>
-        <div className="relative">
-          <select
-            className="input-field appearance-none pr-9 max-w-[160px] cursor-pointer"
-            value={gender}
-            onChange={(e) => setGender(e.target.value)}
-          >
+          </FilterSelect>
+          <FilterSelect label="Gender" value={gender} onChange={setGender}>
             {GENDER_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
-          </select>
-          <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
-        </div>
-        <div className="relative">
-          <select
-            className="input-field appearance-none pr-9 max-w-[180px] cursor-pointer"
-            value={kota}
-            onChange={(e) => setKota(e.target.value)}
-          >
+          </FilterSelect>
+          <FilterSelect label="Kota" value={kota} onChange={setKota}>
             <option value="">Semua Kota</option>
             {(summary?.kotaOptions || []).map((k) => (
               <option key={k} value={k}>{k}</option>
             ))}
-          </select>
-          <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
-        </div>
-        <div className="relative">
-          <select
-            className="input-field appearance-none pr-9 max-w-[200px] cursor-pointer"
-            value={diprosesOleh}
-            onChange={(e) => setDiprosesOleh(e.target.value)}
-          >
+          </FilterSelect>
+          <FilterSelect label="Admin" value={diprosesOleh} onChange={setDiprosesOleh}>
             <option value="">Semua Admin</option>
             <option value="__belum__">Belum Diproses</option>
             {(summary?.processedByOptions || []).map((email) => (
               <option key={email} value={email}>{email.split("@")[0]}</option>
             ))}
-          </select>
-          <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
-        </div>
-        <div className="relative">
-          <select
-            className="input-field appearance-none pr-9 max-w-[190px] cursor-pointer"
-            value={sumberInfo}
-            onChange={(e) => setSumberInfo(e.target.value)}
-          >
+          </FilterSelect>
+          <FilterSelect label="Sumber Info" value={sumberInfo} onChange={setSumberInfo}>
             {SUMBER_INFO_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
-          </select>
-          <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
-        </div>
-        <div className="relative">
-          <select
-            className="input-field appearance-none pr-9 max-w-[210px] cursor-pointer"
-            value={punyaAlat}
-            onChange={(e) => setPunyaAlat(e.target.value)}
-          >
+          </FilterSelect>
+          <FilterSelect label="Alat Cleaning" value={punyaAlat} onChange={setPunyaAlat}>
             {PUNYA_ALAT_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
-          </select>
-          <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+          </FilterSelect>
         </div>
-        {hasActiveFilters && (
-          <button
-            onClick={resetFilters}
-            className="flex items-center gap-1 text-xs font-medium text-ink-muted hover:text-brand transition px-2 py-1.5"
-          >
-            <X size={13} />
-            Reset filter
-          </button>
-        )}
       </div>
 
       {/* Table */}
@@ -540,14 +496,14 @@ function AdminDashboardContent() {
             <thead className="bg-gray-50/70 text-gray-400 text-left">
               <tr className="text-[11px] uppercase tracking-wider">
                 <SortableHeader label="Nama" field="nama" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
-                <th className="px-4 py-3 font-semibold">Kategori</th>
-                <th className="px-4 py-3 font-semibold">Domisili</th>
-                <th className="px-4 py-3 font-semibold">Motor</th>
-                <th className="px-4 py-3 font-semibold">Sumber Info</th>
-                <th className="px-4 py-3 font-semibold">Status</th>
-                <th className="px-4 py-3 font-semibold">Diproses Oleh</th>
+                <th className="px-4 py-3 font-semibold whitespace-nowrap">Kategori</th>
+                <th className="px-4 py-3 font-semibold whitespace-nowrap">Domisili</th>
+                <th className="px-4 py-3 font-semibold whitespace-nowrap">Motor</th>
+                <th className="px-4 py-3 font-semibold whitespace-nowrap">Sumber Info</th>
+                <th className="px-4 py-3 font-semibold whitespace-nowrap">Status</th>
+                <th className="px-4 py-3 font-semibold whitespace-nowrap">Diproses Oleh</th>
                 <SortableHeader label="Tanggal" field="created_at" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
-                <th className="px-4 py-3 font-semibold text-right">Aksi</th>
+                <th className="px-4 py-3 font-semibold whitespace-nowrap text-right">Aksi</th>
               </tr>
             </thead>
             <tbody>
@@ -579,7 +535,7 @@ function AdminDashboardContent() {
                           </div>
                         </Link>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 whitespace-nowrap">
                         <span className={`badge ${kategoriStyle?.classes || "bg-gray-100 text-gray-600"}`}>
                           {kategoriStyle?.label || a.kategori.replace("_", " ")}
                         </span>
@@ -597,7 +553,7 @@ function AdminDashboardContent() {
                       <td className="px-4 py-3 text-ink-muted">
                         {SUMBER_INFO_LABELS[a.sumber_info] || <span className="text-gray-300">-</span>}
                       </td>
-                      <td className="px-4 py-3"><StatusBadge status={a.status} /></td>
+                      <td className="px-4 py-3 whitespace-nowrap"><StatusBadge status={a.status} /></td>
                       <td className="px-4 py-3">
                         {a.updated_by ? (
                           <span
@@ -699,10 +655,30 @@ export default function AdminDashboardPage() {
   );
 }
 
+function FilterSelect({ label, value, onChange, children }) {
+  const active = Boolean(value);
+  return (
+    <div className="relative">
+      <select
+        aria-label={label}
+        title={label}
+        className={`input-field appearance-none w-full pr-9 cursor-pointer ${
+          active ? "!border-brand !bg-brand-light/40 text-brand font-medium" : ""
+        }`}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {children}
+      </select>
+      <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+    </div>
+  );
+}
+
 function SortableHeader({ label, field, sortBy, sortDir, onSort }) {
   const active = sortBy === field;
   return (
-    <th className="px-4 py-3 font-semibold">
+    <th className="px-4 py-3 font-semibold whitespace-nowrap">
       <button
         onClick={() => onSort(field)}
         className={`flex items-center gap-1 uppercase tracking-wider text-[11px] font-semibold transition ${
