@@ -15,7 +15,15 @@ const initialForm = {
   punya_alat_cleaning: "", // khusus daily_cleaning
   melayani_gender: "", // khusus massage
   jam_operasional: "",
+  sumber_info: "",
 };
+
+const SUMBER_INFO_OPTIONS = [
+  { value: "whatsapp", label: "WhatsApp" },
+  { value: "facebook", label: "Facebook" },
+  { value: "teman", label: "Teman" },
+  { value: "lainnya", label: "Lainnya" },
+];
 
 const JAM_OPERASIONAL_OPTIONS = [
   { value: "08:00-17:00", label: "08.00 – 17.00", tag: "Pagi – Sore" },
@@ -93,6 +101,11 @@ export default function ApplyPage() {
 
     if (!form.jam_operasional) {
       toast.error("Pilih dulu jam operasional kamu ya");
+      return;
+    }
+
+    if (!form.sumber_info) {
+      toast.error("Pilih dulu kamu tahu info ini dari mana ya");
       return;
     }
 
@@ -464,6 +477,38 @@ export default function ApplyPage() {
               Jam ini jadi acuan waktu standby kamu — kalau ada job yang masuk di jam
               tersebut, wajib dikerjakan.
             </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1.5">Dapat Info Dari Mana?</label>
+            <div className="relative">
+              <select
+                className="input-field appearance-none pr-9 cursor-pointer"
+                value={form.sumber_info}
+                onChange={(e) => updateField("sumber_info", e.target.value)}
+              >
+                <option value="">Pilih sumber info</option>
+                {SUMBER_INFO_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <svg
+                className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted"
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
           </div>
 
           <div>

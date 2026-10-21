@@ -300,6 +300,14 @@ export default function ApplicantDetailPage() {
             value={new Date(applicant.created_at).toLocaleString("id-ID")}
           />
           <Field
+            label="Sumber Info"
+            value={
+              { whatsapp: "WhatsApp", facebook: "Facebook", teman: "Teman", lainnya: "Lainnya" }[
+                applicant.sumber_info
+              ] || "-"
+            }
+          />
+          <Field
             label="Jam Operasional"
             value={applicant.jam_operasional ? applicant.jam_operasional.replace("-", " – ") : "-"}
           />

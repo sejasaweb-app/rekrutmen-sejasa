@@ -34,6 +34,7 @@ export async function POST(request) {
       foto_alat_name,
       melayani_gender,
       jam_operasional,
+      sumber_info,
       website, // honeypot — field ga kelihatan di UI, cuma bot yang biasanya ngisi ini
       form_rendered_at, // timestamp pas form pertama kali dibuka
     } = body;
@@ -61,6 +62,11 @@ export async function POST(request) {
     const JAM_OPERASIONAL_VALID = ["08:00-17:00", "09:00-18:00", "12:00-21:00"];
     if (!jam_operasional || !JAM_OPERASIONAL_VALID.includes(jam_operasional)) {
       return NextResponse.json({ error: "Wajib pilih jam operasional" }, { status: 400 });
+    }
+
+    const SUMBER_INFO_VALID = ["whatsapp", "facebook", "teman", "lainnya"];
+    if (!sumber_info || !SUMBER_INFO_VALID.includes(sumber_info)) {
+      return NextResponse.json({ error: "Wajib pilih dapat info dari mana" }, { status: 400 });
     }
 
     if (!file_url) {
@@ -158,6 +164,7 @@ export async function POST(request) {
           foto_alat_name: kategori === "daily_cleaning" ? foto_alat_name || null : null,
           melayani_gender: kategori === "massage" ? melayani_gender : null,
           jam_operasional,
+          sumber_info,
         },
       ])
       .select()
@@ -175,7 +182,8 @@ export async function POST(request) {
 }
 
 // GET — list applicants buat dashboard admin, support filter & search
-// query params: status, kategori, gender, kota, q (cari nama/email/telp), diproses_oleh
+// query params: status, kategori, gender, kota, q (cari nama/email/telp), diproses_oleh,
+// sumber_info (whatsapp|facebook|teman|lainnya), punya_alat (ya|tidak — khusus daily cleaning)
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -185,6 +193,8 @@ export async function GET(request) {
     const kota = searchParams.get("kota");
     const q = searchParams.get("q");
     const diprosesOleh = searchParams.get("diproses_oleh");
+    const sumberInfo = searchParams.get("sumber_info");
+    const punyaAlat = searchParams.get("punya_alat");
 
     const supabase = supabaseAdmin();
     let query = supabase
@@ -202,6 +212,11 @@ export async function GET(request) {
     if (q) query = query.or(`nama.ilike.%${q}%,email.ilike.%${q}%,no_telp.ilike.%${q}%`);
     if (diprosesOleh === "__belum__") query = query.is("updated_by", null);
     else if (diprosesOleh) query = query.eq("updated_by", diprosesOleh);
+    if (sumberInfo) query = query.eq("sumber_info", sumberInfo);
+    // punya_alat_cleaning cuma diisi untuk kategori daily_cleaning (massage = null),
+    // jadi pelamar massage otomatis ga muncul kalau filter ini dipakai.
+    if (punyaAlat === "ya") query = query.eq("punya_alat_cleaning", true);
+    else if (punyaAlat === "tidak") query = query.eq("punya_alat_cleaning", false);
 
     const { data, error } = await query;
     if (error) throw error;

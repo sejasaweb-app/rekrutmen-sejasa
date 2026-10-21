@@ -73,6 +73,27 @@ const GENDER_OPTIONS = [
   { value: "female", label: "Perempuan" },
 ];
 
+const SUMBER_INFO_OPTIONS = [
+  { value: "", label: "Semua Sumber Info" },
+  { value: "whatsapp", label: "WhatsApp" },
+  { value: "facebook", label: "Facebook" },
+  { value: "teman", label: "Teman" },
+  { value: "lainnya", label: "Lainnya" },
+];
+
+const SUMBER_INFO_LABELS = {
+  whatsapp: "WhatsApp",
+  facebook: "Facebook",
+  teman: "Teman",
+  lainnya: "Lainnya",
+};
+
+const PUNYA_ALAT_OPTIONS = [
+  { value: "", label: "Semua (Alat Cleaning)" },
+  { value: "ya", label: "Punya Alat" },
+  { value: "tidak", label: "Tidak Punya Alat" },
+];
+
 const KATEGORI_STYLES = {
   massage: { label: "Massage", classes: "bg-brand-light text-brand" },
   daily_cleaning: { label: "Daily Cleaning", classes: "bg-teal-100 text-teal-700" },
@@ -110,6 +131,8 @@ function AdminDashboardContent() {
   const [gender, setGender] = useState(searchParams.get("gender") || "");
   const [kota, setKota] = useState(searchParams.get("kota") || "");
   const [diprosesOleh, setDiprosesOleh] = useState(searchParams.get("diproses_oleh") || "");
+  const [sumberInfo, setSumberInfo] = useState(searchParams.get("sumber_info") || "");
+  const [punyaAlat, setPunyaAlat] = useState(searchParams.get("punya_alat") || "");
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const [pageSize, setPageSize] = useState(
@@ -130,6 +153,8 @@ function AdminDashboardContent() {
     if (gender) params.set("gender", gender);
     if (kota) params.set("kota", kota);
     if (diprosesOleh) params.set("diproses_oleh", diprosesOleh);
+    if (sumberInfo) params.set("sumber_info", sumberInfo);
+    if (punyaAlat) params.set("punya_alat", punyaAlat);
     if (q) params.set("q", q);
 
     const [summaryRes, listRes] = await Promise.all([
@@ -143,7 +168,7 @@ function AdminDashboardContent() {
     setApplicants(listData.applicants || []);
     setLoading(false);
     setLastUpdated(new Date());
-  }, [status, kategori, gender, kota, diprosesOleh, q]);
+  }, [status, kategori, gender, kota, diprosesOleh, sumberInfo, punyaAlat, q]);
 
   // Tombol refresh manual — dipisah dari `loading` (yang juga dipakai skeleton awal)
   // biar animasi ikon berputar cuma jelas kelihatan pas user sengaja klik refresh.
@@ -177,7 +202,7 @@ function AdminDashboardContent() {
       return;
     }
     setPage(1);
-  }, [status, kategori, gender, kota, diprosesOleh, q, pageSize]);
+  }, [status, kategori, gender, kota, diprosesOleh, sumberInfo, punyaAlat, q, pageSize]);
 
   // Simpan kombinasi filter/halaman ke URL (replace, ga nambah history baru)
   // biar tombol back browser dari halaman detail balik ke state list yang sama.
@@ -188,14 +213,18 @@ function AdminDashboardContent() {
     if (gender) params.set("gender", gender);
     if (kota) params.set("kota", kota);
     if (diprosesOleh) params.set("diproses_oleh", diprosesOleh);
+    if (sumberInfo) params.set("sumber_info", sumberInfo);
+    if (punyaAlat) params.set("punya_alat", punyaAlat);
     if (q) params.set("q", q);
     if (page > 1) params.set("page", String(page));
     if (pageSize !== PAGE_SIZE_OPTIONS[0]) params.set("pageSize", String(pageSize));
     const qs = params.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [status, kategori, gender, kota, diprosesOleh, page, pageSize, pathname, router, q]);
+  }, [status, kategori, gender, kota, diprosesOleh, sumberInfo, punyaAlat, page, pageSize, pathname, router, q]);
 
-  const hasActiveFilters = Boolean(q || status || kategori || gender || kota || diprosesOleh);
+  const hasActiveFilters = Boolean(
+    q || status || kategori || gender || kota || diprosesOleh || sumberInfo || punyaAlat
+  );
 
   function resetFilters() {
     setQ("");
@@ -204,6 +233,8 @@ function AdminDashboardContent() {
     setGender("");
     setKota("");
     setDiprosesOleh("");
+    setSumberInfo("");
+    setPunyaAlat("");
   }
 
   function toggleSort(field) {
@@ -250,7 +281,7 @@ function AdminDashboardContent() {
   const paginated = sortedApplicants.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   function exportCsv() {
-    const headers = ["Nama", "Email", "No Telp", "Gender", "Domisili", "Kategori", "Punya Motor", "Jam Operasional", "Status", "Diproses Oleh", "Tanggal Daftar"];
+    const headers = ["Nama", "Email", "No Telp", "Gender", "Domisili", "Kategori", "Punya Motor", "Punya Alat Cleaning", "Sumber Info", "Jam Operasional", "Status", "Diproses Oleh", "Tanggal Daftar"];
     const rows = sortedApplicants.map((a) => [
       a.nama,
       a.email,
@@ -259,6 +290,8 @@ function AdminDashboardContent() {
       a.domisili,
       a.kategori.replace("_", " "),
       a.punya_motor ? "Ya" : "Tidak",
+      a.kategori === "daily_cleaning" ? (a.punya_alat_cleaning ? "Ya" : "Tidak") : "-",
+      SUMBER_INFO_LABELS[a.sumber_info] || "-",
       a.jam_operasional ? a.jam_operasional.replace("-", " – ") : "-",
       STATUS_META[a.status]?.label || a.status,
       a.updated_by || "-",
@@ -465,6 +498,30 @@ function AdminDashboardContent() {
           </select>
           <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
         </div>
+        <div className="relative">
+          <select
+            className="input-field appearance-none pr-9 max-w-[190px] cursor-pointer"
+            value={sumberInfo}
+            onChange={(e) => setSumberInfo(e.target.value)}
+          >
+            {SUMBER_INFO_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+        </div>
+        <div className="relative">
+          <select
+            className="input-field appearance-none pr-9 max-w-[210px] cursor-pointer"
+            value={punyaAlat}
+            onChange={(e) => setPunyaAlat(e.target.value)}
+          >
+            {PUNYA_ALAT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+          <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
+        </div>
         {hasActiveFilters && (
           <button
             onClick={resetFilters}
@@ -486,6 +543,7 @@ function AdminDashboardContent() {
                 <th className="px-4 py-3 font-semibold">Kategori</th>
                 <th className="px-4 py-3 font-semibold">Domisili</th>
                 <th className="px-4 py-3 font-semibold">Motor</th>
+                <th className="px-4 py-3 font-semibold">Sumber Info</th>
                 <th className="px-4 py-3 font-semibold">Status</th>
                 <th className="px-4 py-3 font-semibold">Diproses Oleh</th>
                 <SortableHeader label="Tanggal" field="created_at" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
@@ -497,7 +555,7 @@ function AdminDashboardContent() {
                 Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)
               ) : applicants.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-16 text-center">
+                  <td colSpan={9} className="px-4 py-16 text-center">
                     <div className="text-ink-muted text-sm">
                       {q || status || kategori
                         ? "Tidak ada pendaftar yang cocok dengan filter ini."
@@ -535,6 +593,9 @@ function AdminDashboardContent() {
                         ) : (
                           <span className="text-xs text-ink-muted">Tidak</span>
                         )}
+                      </td>
+                      <td className="px-4 py-3 text-ink-muted">
+                        {SUMBER_INFO_LABELS[a.sumber_info] || <span className="text-gray-300">-</span>}
                       </td>
                       <td className="px-4 py-3"><StatusBadge status={a.status} /></td>
                       <td className="px-4 py-3">
@@ -674,6 +735,7 @@ function SkeletonRow() {
       <td className="px-4 py-3"><div className="h-5 w-20 bg-gray-100 rounded-full animate-pulse" /></td>
       <td className="px-4 py-3"><div className="h-3 w-28 bg-gray-100 rounded animate-pulse" /></td>
       <td className="px-4 py-3"><div className="h-3 w-10 bg-gray-100 rounded animate-pulse" /></td>
+      <td className="px-4 py-3"><div className="h-3 w-14 bg-gray-100 rounded animate-pulse" /></td>
       <td className="px-4 py-3"><div className="h-5 w-20 bg-gray-100 rounded-full animate-pulse" /></td>
       <td className="px-4 py-3"><div className="h-3 w-16 bg-gray-100 rounded animate-pulse" /></td>
       <td className="px-4 py-3"><div className="h-3 w-10 bg-gray-100 rounded animate-pulse ml-auto" /></td>
