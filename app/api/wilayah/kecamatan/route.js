@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { ALLOWED_KOTA_IDS } from "../kota/route";
 
 const BASE = "https://www.emsifa.com/api-wilayah-indonesia/api";
 
@@ -9,6 +10,10 @@ export async function GET(request) {
 
     if (!kotaId) {
       return NextResponse.json({ error: "kota_id wajib diisi" }, { status: 400 });
+    }
+
+    if (!ALLOWED_KOTA_IDS.includes(kotaId)) {
+      return NextResponse.json({ error: "Kota di luar area layanan" }, { status: 400 });
     }
 
     const res = await fetch(`${BASE}/districts/${kotaId}.json`, {

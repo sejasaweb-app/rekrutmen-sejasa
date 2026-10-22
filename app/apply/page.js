@@ -56,8 +56,8 @@ export default function ApplyPage() {
     fetch("/api/wilayah/kota")
       .then((r) => r.json())
       .then((data) => {
-        if (data.error || !data.kota) throw new Error();
-        setKotaList(data.kota.map((k) => ({ id: k.id, label: k.name, sublabel: k.provinsi })));
+        if (data.error || !data.kota || data.kota.length === 0) throw new Error();
+        setKotaList(data.kota.map((k) => ({ id: k.id, label: k.name, sublabel: k.area })));
       })
       .catch(() => setKotaError(true))
       .finally(() => setKotaLoading(false));
@@ -311,6 +311,11 @@ export default function ApplyPage() {
                 placeholder="Pilih kota/kabupaten"
                 loading={kotaLoading}
               />
+            )}
+            {!kotaError && (
+              <p className="text-xs text-ink-muted mt-1.5">
+                Saat ini kami melayani area Jabodetabek, Bandung, dan Surabaya.
+              </p>
             )}
           </div>
 

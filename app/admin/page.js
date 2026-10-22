@@ -52,7 +52,7 @@ function formatRelativeTime(date) {
 }
 
 const STATUS_OPTIONS = [
-  { value: "", label: "Semua Status" },
+  { value: "", label: "Status" },
   { value: "data_baru", label: "Data Baru" },
   { value: "pending", label: "Pending" },
   { value: "screening", label: "Screening" },
@@ -62,19 +62,19 @@ const STATUS_OPTIONS = [
 ];
 
 const KATEGORI_OPTIONS = [
-  { value: "", label: "Semua Kategori" },
+  { value: "", label: "Kategori" },
   { value: "massage", label: "Massage" },
   { value: "daily_cleaning", label: "Daily Cleaning" },
 ];
 
 const GENDER_OPTIONS = [
-  { value: "", label: "Semua Gender" },
+  { value: "", label: "Gender" },
   { value: "male", label: "Laki-laki" },
   { value: "female", label: "Perempuan" },
 ];
 
 const SUMBER_INFO_OPTIONS = [
-  { value: "", label: "Semua Sumber" },
+  { value: "", label: "Sumber Info" },
   { value: "whatsapp", label: "WhatsApp" },
   { value: "facebook", label: "Facebook" },
   { value: "teman", label: "Teman" },
@@ -89,7 +89,7 @@ const SUMBER_INFO_LABELS = {
 };
 
 const PUNYA_ALAT_OPTIONS = [
-  { value: "", label: "Semua Alat" },
+  { value: "", label: "Alat Cleaning" },
   { value: "ya", label: "Punya Alat" },
   { value: "tidak", label: "Tidak Punya Alat" },
 ];
@@ -464,13 +464,13 @@ function AdminDashboardContent() {
             ))}
           </FilterSelect>
           <FilterSelect label="Kota" value={kota} onChange={setKota}>
-            <option value="">Semua Kota</option>
+            <option value="">Kota</option>
             {(summary?.kotaOptions || []).map((k) => (
               <option key={k} value={k}>{k}</option>
             ))}
           </FilterSelect>
           <FilterSelect label="Admin" value={diprosesOleh} onChange={setDiprosesOleh}>
-            <option value="">Semua Admin</option>
+            <option value="">Admin</option>
             <option value="__belum__">Belum Diproses</option>
             {(summary?.processedByOptions || []).map((email) => (
               <option key={email} value={email}>{email.split("@")[0]}</option>
