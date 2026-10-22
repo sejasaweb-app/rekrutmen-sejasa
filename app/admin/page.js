@@ -21,7 +21,6 @@ import {
   Trash2,
   X,
   Bike,
-  PauseCircle,
   UserCircle2,
 } from "lucide-react";
 import StatusBadge, { STATUS_META } from "@/components/StatusBadge";
@@ -90,6 +89,18 @@ const SUMBER_INFO_LABELS = {
   lainnya: "Lainnya",
 };
 
+// Tab status di atas tabel (gantikan funnel besar + dropdown Status).
+const STATUS_TABS = [{ value: "", label: "Semua" }, ...STATUS_OPTIONS.filter((o) => o.value)];
+
+// "CENGKARENG, KOTA JAKARTA BARAT" -> "Cengkareng, Kota Jakarta Barat"
+function toTitleCase(str) {
+  if (!str) return "";
+  return str
+    .toLowerCase()
+    .replace(/(^|[\s,.(\-/])(\p{L})/gu, (_, sep, ch) => sep + ch.toUpperCase())
+    .replace(/\bDki\b/g, "DKI");
+}
+
 const PUNYA_ALAT_OPTIONS = [
   { value: "", label: "Alat Cleaning" },
   { value: "ya", label: "Punya Alat" },
@@ -110,15 +121,6 @@ const KATEGORI_STYLES = {
   massage: { label: "Massage", classes: "bg-brand-light text-brand" },
   daily_cleaning: { label: "Daily Cleaning", classes: "bg-teal-100 text-teal-700" },
 };
-
-const FUNNEL_STEPS = [
-  { value: "data_baru", label: "Data Baru", color: "#94A3B8" },
-  { value: "pending", label: "Pending", color: "#F59E0B" },
-  { value: "screening", label: "Screening", color: "#3B82F6" },
-  { value: "onboarding", label: "Onboarding", color: "#8B5CF6" },
-  { value: "approved", label: "Diterima", color: "#16A34A" },
-  { value: "rejected", label: "Ditolak", color: "#DC2626" },
-];
 
 const PAGE_SIZE_OPTIONS = [20, 50, 100];
 
@@ -291,8 +293,6 @@ function AdminDashboardContent() {
     }
   }
 
-  const funnelTotal = summary?.total || 0;
-
   const kotaFilterOptions = useMemo(
     () => [{ value: "", label: "Kota" }, ...(summary?.kotaOptions || []).map((k) => ({ value: k, label: k }))],
     [summary]
@@ -454,75 +454,76 @@ function AdminDashboardContent() {
         </div>
       </div>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
+      {/* Summary cards — semuanya bisa diklik buat jadi filter cepat */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
         <SummaryCard
           icon={Users}
           label="Total Pendaftar"
           value={summary?.total ?? "-"}
           accent="#E6007E"
           highlight
+          onClick={resetFilters}
         />
         <SummaryCard
           icon={Sparkles}
           label="Massage"
           value={summary?.byKategori?.massage ?? 0}
           accent="#F59E0B"
+          active={kategori === "massage"}
+          onClick={() => setKategori(kategori === "massage" ? "" : "massage")}
         />
         <SummaryCard
           icon={Home}
           label="Daily Cleaning"
           value={summary?.byKategori?.daily_cleaning ?? 0}
           accent="#3B82F6"
-        />
-        <SummaryCard
-          icon={PauseCircle}
-          label="Pending"
-          value={summary?.byStatus?.pending ?? 0}
-          accent="#F59E0B"
-          onClick={() => setStatus("pending")}
+          active={kategori === "daily_cleaning"}
+          onClick={() => setKategori(kategori === "daily_cleaning" ? "" : "daily_cleaning")}
         />
         <SummaryCard
           icon={CheckCircle2}
           label="Diterima"
           value={summary?.byStatus?.approved ?? 0}
           accent="#16A34A"
+          active={status === "approved"}
+          onClick={() => setStatus(status === "approved" ? "" : "approved")}
         />
       </div>
 
-      {/* Funnel chart */}
-      <div className="card p-5 mb-6 hover:shadow-card-lg transition-shadow duration-200">
-        <h2 className="font-display text-sm font-semibold mb-5">Funnel Status</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-          {FUNNEL_STEPS.map((step) => {
-            const value = summary?.byStatus?.[step.value] ?? 0;
-            const pct = funnelTotal > 0 ? (value / funnelTotal) * 100 : 0;
-            const Icon = STATUS_META[step.value]?.icon;
+      {/* Tab status */}
+      <div className="mb-4 -mx-1 overflow-x-auto pb-1">
+        <div className="flex items-center gap-2 px-1 min-w-max">
+          {STATUS_TABS.map((tab) => {
+            const isActive = status === tab.value;
+            const meta = STATUS_META[tab.value];
+            const count = tab.value === "" ? summary?.total : summary?.byStatus?.[tab.value] ?? 0;
             return (
-              <div key={step.value}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-sm text-ink flex items-center gap-2">
-                    {Icon ? (
-                      <Icon size={13} style={{ color: step.color }} strokeWidth={2.25} />
-                    ) : (
-                      <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: step.color }} />
-                    )}
-                    {step.label}
-                  </span>
-                  <span className="text-sm font-semibold tabular-nums">
-                    {value}
-                    {funnelTotal > 0 && (
-                      <span className="text-xs text-ink-muted font-normal ml-1.5 tabular-nums">({Math.round(pct)}%)</span>
-                    )}
-                  </span>
-                </div>
-                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-300"
-                    style={{ width: `${pct}%`, backgroundColor: step.color }}
+              <button
+                key={tab.value || "semua"}
+                type="button"
+                aria-pressed={isActive}
+                onClick={() => setStatus(tab.value)}
+                className={`flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm font-medium whitespace-nowrap transition ${
+                  isActive
+                    ? "bg-brand border-brand text-white shadow-sm"
+                    : "bg-white border-gray-200 text-ink-muted hover:border-brand/50 hover:text-ink"
+                }`}
+              >
+                {meta && (
+                  <span
+                    className="w-1.5 h-1.5 rounded-full shrink-0"
+                    style={{ backgroundColor: isActive ? "#fff" : meta.dot }}
                   />
-                </div>
-              </div>
+                )}
+                {tab.label}
+                <span
+                  className={`min-w-[1.5rem] rounded-full px-1.5 py-0.5 text-[11px] leading-none text-center tabular-nums ${
+                    isActive ? "bg-white/25 text-white" : "bg-gray-100 text-ink-muted"
+                  }`}
+                >
+                  {count ?? "–"}
+                </span>
+              </button>
             );
           })}
         </div>
@@ -560,8 +561,7 @@ function AdminDashboardContent() {
           )}
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <FilterDropdown label="Status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
+        <div className="grid grid-cols-2 md:grid-cols-4 2xl:grid-cols-7 gap-3">
           <FilterDropdown label="Kategori" value={kategori} onChange={setKategori} options={KATEGORI_OPTIONS} />
           <FilterDropdown label="Gender" value={gender} onChange={setGender} options={GENDER_OPTIONS} />
           <FilterDropdown label="Kota" value={kota} onChange={setKota} options={kotaFilterOptions} searchable />
@@ -572,11 +572,46 @@ function AdminDashboardContent() {
         </div>
       </div>
 
-      {/* Table */}
+      {/* Daftar pelamar */}
       <div className="card overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile: kartu per pelamar */}
+        <div className="md:hidden">
+          {!loading && paginated.length > 0 && (
+            <label className="flex items-center gap-2.5 px-4 py-3 border-b border-gray-100 bg-gray-50/70 text-xs font-medium text-ink-muted">
+              <input
+                type="checkbox"
+                className="w-4 h-4 rounded border-gray-300 accent-brand cursor-pointer"
+                checked={allPageSelected}
+                ref={(el) => {
+                  if (el) el.indeterminate = somePageSelected && !allPageSelected;
+                }}
+                onChange={togglePage}
+              />
+              Pilih semua di halaman ini
+            </label>
+          )}
+          {loading ? (
+            Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+          ) : applicants.length === 0 ? (
+            <EmptyState filtered={hasActiveFilters} onReset={resetFilters} />
+          ) : (
+            paginated.map((a) => (
+              <ApplicantCard
+                key={a.id}
+                a={a}
+                selected={selectedIds.has(a.id)}
+                onToggle={() => toggleOne(a.id)}
+                onDelete={() => handleDelete(a.id, a.nama)}
+                deleting={deletingId === a.id}
+              />
+            ))
+          )}
+        </div>
+
+        {/* Desktop: tabel (header nempel pas di-scroll) */}
+        <div className="hidden md:block max-h-[75vh] overflow-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50/70 text-gray-400 text-left">
+            <thead className="text-gray-400 text-left [&_th]:sticky [&_th]:top-0 [&_th]:z-10 [&_th]:bg-gray-50 [&_th]:shadow-[0_1px_0_0_rgba(0,0,0,0.06)]">
               <tr className="text-[11px] uppercase tracking-wider">
                 <th className="pl-4 pr-0 py-3 w-10">
                   <input
@@ -596,9 +631,8 @@ function AdminDashboardContent() {
                 <th className="px-4 py-3 font-semibold whitespace-nowrap">Kategori</th>
                 <th className="px-4 py-3 font-semibold whitespace-nowrap">Domisili</th>
                 <th className="px-4 py-3 font-semibold whitespace-nowrap">Motor</th>
-                <th className="px-4 py-3 font-semibold whitespace-nowrap">Sumber Info</th>
+                <th className="px-4 py-3 font-semibold whitespace-nowrap">Sumber</th>
                 <th className="px-4 py-3 font-semibold whitespace-nowrap">Status</th>
-                <th className="px-4 py-3 font-semibold whitespace-nowrap">Diproses Oleh</th>
                 <SortableHeader label="Tanggal" field="created_at" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                 <th className="px-4 py-3 font-semibold whitespace-nowrap text-right">Aksi</th>
               </tr>
@@ -608,12 +642,8 @@ function AdminDashboardContent() {
                 Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)
               ) : applicants.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="px-4 py-16 text-center">
-                    <div className="text-ink-muted text-sm">
-                      {q || status || kategori
-                        ? "Tidak ada pendaftar yang cocok dengan filter ini."
-                        : "Belum ada pendaftar. Data bakal muncul di sini setelah ada yang isi form."}
-                    </div>
+                  <td colSpan={9}>
+                    <EmptyState filtered={hasActiveFilters} onReset={resetFilters} />
                   </td>
                 </tr>
               ) : (
@@ -651,34 +681,28 @@ function AdminDashboardContent() {
                           {kategoriStyle?.label || a.kategori.replace("_", " ")}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-ink-muted">{a.domisili}</td>
                       <td className="px-4 py-3">
-                        {a.punya_motor ? (
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700">
-                            <Bike size={13} /> Ya
-                          </span>
-                        ) : (
-                          <span className="text-xs text-ink-muted">Tidak</span>
-                        )}
+                        <Domisili value={a.domisili} />
                       </td>
-                      <td className="px-4 py-3 text-ink-muted">
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <MotorLabel punyaMotor={a.punya_motor} />
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap text-ink-muted">
                         {SUMBER_INFO_LABELS[a.sumber_info] || <span className="text-gray-300">-</span>}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap"><StatusBadge status={a.status} /></td>
-                      <td className="px-4 py-3">
-                        {a.updated_by ? (
-                          <span
-                            className="inline-flex items-center gap-1 text-xs text-ink-muted"
-                            title={a.updated_by}
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <StatusBadge status={a.status} />
+                        {a.updated_by && (
+                          <div
+                            className="mt-1 flex items-center gap-1 text-[11px] text-ink-muted"
+                            title={`Diproses oleh ${a.updated_by}`}
                           >
-                            <UserCircle2 size={13} className="text-gray-400" />
+                            <UserCircle2 size={11} className="text-gray-400" />
                             {a.updated_by.split("@")[0]}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-gray-300">-</span>
+                          </div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-ink-muted">
+                      <td className="px-4 py-3 whitespace-nowrap text-ink-muted">
                         {new Date(a.created_at).toLocaleDateString("id-ID")}
                       </td>
                       <td className="px-4 py-3">
@@ -688,7 +712,6 @@ function AdminDashboardContent() {
                               href={toWhatsAppLink(a.no_telp)}
                               target="_blank"
                               rel="noreferrer"
-                              onClick={(e) => e.stopPropagation()}
                               title="Buka WhatsApp"
                               className="inline-flex items-center justify-center w-7 h-7 rounded-full text-green-600 hover:bg-green-50 transition"
                             >
@@ -857,7 +880,147 @@ function SkeletonRow() {
   );
 }
 
-function SummaryCard({ icon: Icon, label, value, accent, highlight, onClick }) {
+function Domisili({ value }) {
+  if (!value) return <span className="text-gray-300">-</span>;
+  const [first, ...rest] = toTitleCase(value).split(",").map((part) => part.trim());
+  if (rest.length === 0) return <span className="text-ink">{first}</span>;
+  return (
+    <div className="leading-tight">
+      <div className="text-ink">{first}</div>
+      <div className="text-xs text-ink-muted mt-0.5">{rest.join(", ")}</div>
+    </div>
+  );
+}
+
+function MotorLabel({ punyaMotor }) {
+  return punyaMotor ? (
+    <span className="inline-flex items-center gap-1 text-xs font-medium text-green-700">
+      <Bike size={13} /> Ya
+    </span>
+  ) : (
+    <span className="text-xs text-ink-muted">Tidak</span>
+  );
+}
+
+function EmptyState({ filtered, onReset }) {
+  return (
+    <div className="px-4 py-16 text-center">
+      <div className="mx-auto mb-3 w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center">
+        <Users size={20} className="text-gray-400" />
+      </div>
+      <p className="text-sm font-medium text-ink">
+        {filtered ? "Tidak ada pendaftar yang cocok" : "Belum ada pendaftar"}
+      </p>
+      <p className="text-sm text-ink-muted mt-1">
+        {filtered
+          ? "Coba ubah atau hapus filter yang sedang aktif."
+          : "Data bakal muncul di sini setelah ada yang isi form."}
+      </p>
+      {filtered && (
+        <button
+          onClick={onReset}
+          className="mt-4 rounded-full border border-gray-200 bg-white px-4 py-1.5 text-sm font-medium text-ink hover:border-brand hover:text-brand transition"
+        >
+          Reset filter
+        </button>
+      )}
+    </div>
+  );
+}
+
+// Tampilan HP: satu kartu per pelamar (tabel 9 kolom ga muat di layar kecil).
+function ApplicantCard({ a, selected, onToggle, onDelete, deleting }) {
+  const kategoriStyle = KATEGORI_STYLES[a.kategori];
+  const sumber = SUMBER_INFO_LABELS[a.sumber_info];
+  return (
+    <div
+      className={`flex gap-3 px-4 py-3.5 border-t border-gray-100 first:border-t-0 ${
+        selected ? "bg-brand-light/30" : ""
+      }`}
+    >
+      <input
+        type="checkbox"
+        aria-label={`Pilih ${a.nama}`}
+        className="mt-1 w-4 h-4 rounded border-gray-300 accent-brand cursor-pointer shrink-0"
+        checked={selected}
+        onChange={onToggle}
+      />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-2">
+          <Link href={`/admin/applicants/${a.id}`} className="min-w-0 group">
+            <div className="font-medium text-ink truncate group-hover:text-brand transition-colors">{a.nama}</div>
+            <div className="text-xs text-ink-muted truncate">{a.email}</div>
+          </Link>
+          <div className="shrink-0">
+            <StatusBadge status={a.status} />
+          </div>
+        </div>
+
+        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <span className={`badge ${kategoriStyle?.classes || "bg-gray-100 text-gray-600"}`}>
+            {kategoriStyle?.label || a.kategori.replace("_", " ")}
+          </span>
+          <span className="inline-flex items-center gap-1 text-xs text-ink-muted">
+            Motor: <MotorLabel punyaMotor={a.punya_motor} />
+          </span>
+          {sumber && <span className="text-xs text-ink-muted">via {sumber}</span>}
+        </div>
+
+        <div className="mt-2 flex items-end justify-between gap-2">
+          <div className="min-w-0 text-xs text-ink-muted leading-relaxed">
+            <div className="truncate">{toTitleCase(a.domisili)}</div>
+            <div>
+              {new Date(a.created_at).toLocaleDateString("id-ID")}
+              {a.updated_by && <> · oleh {a.updated_by.split("@")[0]}</>}
+            </div>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            {toWhatsAppLink(a.no_telp) && (
+              <a
+                href={toWhatsAppLink(a.no_telp)}
+                target="_blank"
+                rel="noreferrer"
+                title="Buka WhatsApp"
+                className="inline-flex items-center justify-center w-8 h-8 rounded-full text-green-600 hover:bg-green-50 transition"
+              >
+                <MessageCircle size={16} />
+              </a>
+            )}
+            <button
+              onClick={onDelete}
+              disabled={deleting}
+              title="Hapus data"
+              className="inline-flex items-center justify-center w-8 h-8 rounded-full text-red-500 hover:bg-red-50 transition disabled:opacity-40"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SkeletonCard() {
+  return (
+    <div className="flex gap-3 px-4 py-3.5 border-t border-gray-100 first:border-t-0">
+      <div className="mt-1 w-4 h-4 rounded bg-gray-100 animate-pulse shrink-0" />
+      <div className="flex-1 space-y-2.5">
+        <div className="flex justify-between gap-3">
+          <div className="space-y-1.5 flex-1">
+            <div className="h-3 w-1/2 bg-gray-100 rounded animate-pulse" />
+            <div className="h-2.5 w-2/3 bg-gray-100 rounded animate-pulse" />
+          </div>
+          <div className="h-5 w-16 bg-gray-100 rounded-full animate-pulse" />
+        </div>
+        <div className="h-5 w-24 bg-gray-100 rounded-full animate-pulse" />
+        <div className="h-2.5 w-3/4 bg-gray-100 rounded animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+function SummaryCard({ icon: Icon, label, value, accent, highlight, active, onClick }) {
   const Tag = onClick ? "button" : "div";
   const clickableProps = onClick ? { onClick, type: "button" } : {};
 
@@ -882,7 +1045,9 @@ function SummaryCard({ icon: Icon, label, value, accent, highlight, onClick }) {
   return (
     <Tag
       {...clickableProps}
-      className={`card p-5 hover:shadow-card-lg hover:-translate-y-0.5 transition-all duration-200 text-left w-full ${onClick ? "cursor-pointer" : ""}`}
+      className={`card p-5 hover:shadow-card-lg hover:-translate-y-0.5 transition-all duration-200 text-left w-full ${onClick ? "cursor-pointer" : ""} ${
+        active ? "!border-brand/50 ring-2 ring-brand/20" : ""
+      }`}
     >
       <div className="flex items-center justify-between mb-5">
         <div className="text-[13px] text-ink-muted font-medium">{label}</div>
