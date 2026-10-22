@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import StatusBadge, { STATUS_META } from "@/components/StatusBadge";
 import BulkStatusModal from "@/components/BulkStatusModal";
+import FilterDropdown from "@/components/FilterDropdown";
 
 // Ubah nomor telepon Indonesia (format apapun) jadi link wa.me yang valid
 function toWhatsAppLink(phone) {
@@ -292,6 +293,19 @@ function AdminDashboardContent() {
 
   const funnelTotal = summary?.total || 0;
 
+  const kotaFilterOptions = useMemo(
+    () => [{ value: "", label: "Kota" }, ...(summary?.kotaOptions || []).map((k) => ({ value: k, label: k }))],
+    [summary]
+  );
+  const adminFilterOptions = useMemo(
+    () => [
+      { value: "", label: "Admin" },
+      { value: "__belum__", label: "Belum Diproses" },
+      ...(summary?.processedByOptions || []).map((email) => ({ value: email, label: email.split("@")[0] })),
+    ],
+    [summary]
+  );
+
   const sortedApplicants = useMemo(() => {
     const arr = [...applicants];
     arr.sort((a, b) => {
@@ -547,49 +561,14 @@ function AdminDashboardContent() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <FilterSelect label="Status" value={status} onChange={setStatus}>
-            {STATUS_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </FilterSelect>
-          <FilterSelect label="Kategori" value={kategori} onChange={setKategori}>
-            {KATEGORI_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </FilterSelect>
-          <FilterSelect label="Gender" value={gender} onChange={setGender}>
-            {GENDER_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </FilterSelect>
-          <FilterSelect label="Kota" value={kota} onChange={setKota}>
-            <option value="">Kota</option>
-            {(summary?.kotaOptions || []).map((k) => (
-              <option key={k} value={k}>{k}</option>
-            ))}
-          </FilterSelect>
-          <FilterSelect label="Admin" value={diprosesOleh} onChange={setDiprosesOleh}>
-            <option value="">Admin</option>
-            <option value="__belum__">Belum Diproses</option>
-            {(summary?.processedByOptions || []).map((email) => (
-              <option key={email} value={email}>{email.split("@")[0]}</option>
-            ))}
-          </FilterSelect>
-          <FilterSelect label="Sumber Info" value={sumberInfo} onChange={setSumberInfo}>
-            {SUMBER_INFO_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </FilterSelect>
-          <FilterSelect label="Punya Motor" value={punyaMotor} onChange={setPunyaMotor}>
-            {PUNYA_MOTOR_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </FilterSelect>
-          <FilterSelect label="Alat Cleaning" value={punyaAlat} onChange={setPunyaAlat}>
-            {PUNYA_ALAT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </FilterSelect>
+          <FilterDropdown label="Status" value={status} onChange={setStatus} options={STATUS_OPTIONS} />
+          <FilterDropdown label="Kategori" value={kategori} onChange={setKategori} options={KATEGORI_OPTIONS} />
+          <FilterDropdown label="Gender" value={gender} onChange={setGender} options={GENDER_OPTIONS} />
+          <FilterDropdown label="Kota" value={kota} onChange={setKota} options={kotaFilterOptions} searchable />
+          <FilterDropdown label="Admin" value={diprosesOleh} onChange={setDiprosesOleh} options={adminFilterOptions} />
+          <FilterDropdown label="Sumber Info" value={sumberInfo} onChange={setSumberInfo} options={SUMBER_INFO_OPTIONS} />
+          <FilterDropdown label="Punya Motor" value={punyaMotor} onChange={setPunyaMotor} options={PUNYA_MOTOR_OPTIONS} />
+          <FilterDropdown label="Alat Cleaning" value={punyaAlat} onChange={setPunyaAlat} options={PUNYA_ALAT_OPTIONS} />
         </div>
       </div>
 
@@ -830,26 +809,6 @@ export default function AdminDashboardPage() {
     <Suspense fallback={<div className="text-sm text-ink-muted">Memuat dashboard...</div>}>
       <AdminDashboardContent />
     </Suspense>
-  );
-}
-
-function FilterSelect({ label, value, onChange, children }) {
-  const active = Boolean(value);
-  return (
-    <div className="relative">
-      <select
-        aria-label={label}
-        title={label}
-        className={`input-field appearance-none w-full pr-9 cursor-pointer ${
-          active ? "!border-brand !bg-brand-light/40 text-brand font-medium" : ""
-        }`}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        {children}
-      </select>
-      <ChevronDown size={15} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-muted" />
-    </div>
   );
 }
 
