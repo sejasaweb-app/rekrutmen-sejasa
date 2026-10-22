@@ -183,7 +183,8 @@ export async function POST(request) {
 
 // GET — list applicants buat dashboard admin, support filter & search
 // query params: status, kategori, gender, kota, q (cari nama/email/telp), diproses_oleh,
-// sumber_info (whatsapp|facebook|teman|lainnya), punya_alat (ya|tidak — khusus daily cleaning)
+// sumber_info (whatsapp|facebook|teman|lainnya), punya_alat (ya|tidak — khusus daily cleaning),
+// punya_motor (ya|tidak)
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -195,6 +196,7 @@ export async function GET(request) {
     const diprosesOleh = searchParams.get("diproses_oleh");
     const sumberInfo = searchParams.get("sumber_info");
     const punyaAlat = searchParams.get("punya_alat");
+    const punyaMotor = searchParams.get("punya_motor");
 
     const supabase = supabaseAdmin();
     let query = supabase
@@ -215,6 +217,8 @@ export async function GET(request) {
     if (sumberInfo) query = query.eq("sumber_info", sumberInfo);
     // punya_alat_cleaning cuma diisi untuk kategori daily_cleaning (massage = null),
     // jadi pelamar massage otomatis ga muncul kalau filter ini dipakai.
+    if (punyaMotor === "ya") query = query.eq("punya_motor", true);
+    else if (punyaMotor === "tidak") query = query.eq("punya_motor", false);
     if (punyaAlat === "ya") query = query.eq("punya_alat_cleaning", true);
     else if (punyaAlat === "tidak") query = query.eq("punya_alat_cleaning", false);
 

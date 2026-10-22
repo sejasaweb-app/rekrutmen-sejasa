@@ -25,6 +25,7 @@ import {
   UserCircle2,
 } from "lucide-react";
 import StatusBadge, { STATUS_META } from "@/components/StatusBadge";
+import BulkStatusModal from "@/components/BulkStatusModal";
 
 // Ubah nomor telepon Indonesia (format apapun) jadi link wa.me yang valid
 function toWhatsAppLink(phone) {
@@ -94,6 +95,16 @@ const PUNYA_ALAT_OPTIONS = [
   { value: "tidak", label: "Tidak Punya Alat" },
 ];
 
+const PUNYA_MOTOR_OPTIONS = [
+  { value: "", label: "Motor" },
+  { value: "ya", label: "Punya Motor" },
+  { value: "tidak", label: "Tidak Punya Motor" },
+];
+
+// Batas pelamar per sekali proses ubah status massal (jaga-jaga salah pilih,
+// dan biar kuota WhatsApp ga kebakar sekaligus).
+const MAX_BULK = 100;
+
 const KATEGORI_STYLES = {
   massage: { label: "Massage", classes: "bg-brand-light text-brand" },
   daily_cleaning: { label: "Daily Cleaning", classes: "bg-teal-100 text-teal-700" },
@@ -122,6 +133,8 @@ function AdminDashboardContent() {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [, setTick] = useState(0); // cuma buat trigger re-render tiap menit biar teks "X menit lalu" update
   const [deletingId, setDeletingId] = useState(null);
+  const [selectedIds, setSelectedIds] = useState(() => new Set());
+  const [bulkOpen, setBulkOpen] = useState(false);
 
   // Filter & pagination state — nilai awal diambil dari URL, jadi kalau user
   // pencet tombol back dari halaman detail, dia balik ke state yang sama persis
@@ -133,6 +146,7 @@ function AdminDashboardContent() {
   const [diprosesOleh, setDiprosesOleh] = useState(searchParams.get("diproses_oleh") || "");
   const [sumberInfo, setSumberInfo] = useState(searchParams.get("sumber_info") || "");
   const [punyaAlat, setPunyaAlat] = useState(searchParams.get("punya_alat") || "");
+  const [punyaMotor, setPunyaMotor] = useState(searchParams.get("punya_motor") || "");
   const [q, setQ] = useState(searchParams.get("q") || "");
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const [pageSize, setPageSize] = useState(
@@ -155,6 +169,7 @@ function AdminDashboardContent() {
     if (diprosesOleh) params.set("diproses_oleh", diprosesOleh);
     if (sumberInfo) params.set("sumber_info", sumberInfo);
     if (punyaAlat) params.set("punya_alat", punyaAlat);
+    if (punyaMotor) params.set("punya_motor", punyaMotor);
     if (q) params.set("q", q);
 
     const [summaryRes, listRes] = await Promise.all([
@@ -168,7 +183,7 @@ function AdminDashboardContent() {
     setApplicants(listData.applicants || []);
     setLoading(false);
     setLastUpdated(new Date());
-  }, [status, kategori, gender, kota, diprosesOleh, sumberInfo, punyaAlat, q]);
+  }, [status, kategori, gender, kota, diprosesOleh, sumberInfo, punyaAlat, punyaMotor, q]);
 
   // Tombol refresh manual — dipisah dari `loading` (yang juga dipakai skeleton awal)
   // biar animasi ikon berputar cuma jelas kelihatan pas user sengaja klik refresh.
@@ -202,7 +217,18 @@ function AdminDashboardContent() {
       return;
     }
     setPage(1);
-  }, [status, kategori, gender, kota, diprosesOleh, sumberInfo, punyaAlat, q, pageSize]);
+  }, [status, kategori, gender, kota, diprosesOleh, sumberInfo, punyaAlat, punyaMotor, q, pageSize]);
+
+  // Ganti filter/pencarian = daftar yang tampil berubah, jadi pilihan (checkbox)
+  // dikosongin biar ga ada pelamar "kepilih tapi ga keliatan" yang ikut ke-update.
+  const isFirstSelectionRun = useRef(true);
+  useEffect(() => {
+    if (isFirstSelectionRun.current) {
+      isFirstSelectionRun.current = false;
+      return;
+    }
+    setSelectedIds(new Set());
+  }, [status, kategori, gender, kota, diprosesOleh, sumberInfo, punyaAlat, punyaMotor, q]);
 
   // Simpan kombinasi filter/halaman ke URL (replace, ga nambah history baru)
   // biar tombol back browser dari halaman detail balik ke state list yang sama.
@@ -215,15 +241,16 @@ function AdminDashboardContent() {
     if (diprosesOleh) params.set("diproses_oleh", diprosesOleh);
     if (sumberInfo) params.set("sumber_info", sumberInfo);
     if (punyaAlat) params.set("punya_alat", punyaAlat);
+    if (punyaMotor) params.set("punya_motor", punyaMotor);
     if (q) params.set("q", q);
     if (page > 1) params.set("page", String(page));
     if (pageSize !== PAGE_SIZE_OPTIONS[0]) params.set("pageSize", String(pageSize));
     const qs = params.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [status, kategori, gender, kota, diprosesOleh, sumberInfo, punyaAlat, page, pageSize, pathname, router, q]);
+  }, [status, kategori, gender, kota, diprosesOleh, sumberInfo, punyaAlat, punyaMotor, page, pageSize, pathname, router, q]);
 
   const hasActiveFilters = Boolean(
-    q || status || kategori || gender || kota || diprosesOleh || sumberInfo || punyaAlat
+    q || status || kategori || gender || kota || diprosesOleh || sumberInfo || punyaAlat || punyaMotor
   );
 
   function resetFilters() {
@@ -235,6 +262,7 @@ function AdminDashboardContent() {
     setDiprosesOleh("");
     setSumberInfo("");
     setPunyaAlat("");
+    setPunyaMotor("");
   }
 
   function toggleSort(field) {
@@ -279,6 +307,77 @@ function AdminDashboardContent() {
   const totalPages = Math.max(1, Math.ceil(sortedApplicants.length / pageSize));
   const currentPage = Math.min(page, totalPages);
   const paginated = sortedApplicants.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+  // --- Pilih banyak pelamar (buat ubah status massal) ---
+  // Yang dihitung cuma pelamar yang masih ada di daftar sekarang, jadi kalau ada
+  // yang barusan dihapus/ilang dari hasil, jumlahnya tetap akurat.
+  const selectedApplicants = useMemo(
+    () => sortedApplicants.filter((a) => selectedIds.has(a.id)),
+    [sortedApplicants, selectedIds]
+  );
+  const selectedCount = selectedApplicants.length;
+  const pageIds = paginated.map((a) => a.id);
+  const allPageSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));
+  const somePageSelected = pageIds.some((id) => selectedIds.has(id));
+  const selectableTotal = Math.min(sortedApplicants.length, MAX_BULK);
+
+  function toggleOne(id) {
+    if (!selectedIds.has(id) && selectedIds.size >= MAX_BULK) {
+      toast.error(`Maksimal ${MAX_BULK} pelamar sekali proses`);
+      return;
+    }
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function togglePage() {
+    if (allPageSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        pageIds.forEach((id) => next.delete(id));
+        return next;
+      });
+      return;
+    }
+    const next = new Set(selectedIds);
+    for (const id of pageIds) {
+      if (next.size >= MAX_BULK) {
+        toast.error(`Maksimal ${MAX_BULK} pelamar sekali proses`);
+        break;
+      }
+      next.add(id);
+    }
+    setSelectedIds(next);
+  }
+
+  function selectAllResults() {
+    setSelectedIds(new Set(sortedApplicants.slice(0, MAX_BULK).map((a) => a.id)));
+    if (sortedApplicants.length > MAX_BULK) {
+      toast(`Dibatasi ${MAX_BULK} pelamar pertama sekali proses`);
+    }
+  }
+
+  function handleBulkDone({ status: newStatus, updated, skipped, failedIds }) {
+    setBulkOpen(false);
+    const label = STATUS_META[newStatus]?.label || newStatus;
+    if (updated > 0) {
+      toast.success(
+        `${updated} pelamar diubah ke ${label}${skipped > 0 ? ` · ${skipped} dilewati` : ""}`
+      );
+    } else if (failedIds.length === 0) {
+      toast("Tidak ada yang diubah, semua sudah berstatus " + label);
+    }
+    if (failedIds.length > 0) {
+      toast.error(`${failedIds.length} pelamar gagal diubah. Masih terpilih, coba lagi ya.`, { duration: 6000 });
+    }
+    // Yang gagal tetap kepilih biar tinggal klik "Ubah Status" lagi.
+    setSelectedIds(new Set(failedIds));
+    loadData();
+  }
 
   function exportCsv() {
     const headers = ["Nama", "Email", "No Telp", "Gender", "Domisili", "Kategori", "Punya Motor", "Punya Alat Cleaning", "Sumber Info", "Jam Operasional", "Status", "Diproses Oleh", "Tanggal Daftar"];
@@ -447,7 +546,7 @@ function AdminDashboardContent() {
           )}
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 2xl:grid-cols-7 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <FilterSelect label="Status" value={status} onChange={setStatus}>
             {STATUS_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -481,6 +580,11 @@ function AdminDashboardContent() {
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </FilterSelect>
+          <FilterSelect label="Punya Motor" value={punyaMotor} onChange={setPunyaMotor}>
+            {PUNYA_MOTOR_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </FilterSelect>
           <FilterSelect label="Alat Cleaning" value={punyaAlat} onChange={setPunyaAlat}>
             {PUNYA_ALAT_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -495,6 +599,20 @@ function AdminDashboardContent() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50/70 text-gray-400 text-left">
               <tr className="text-[11px] uppercase tracking-wider">
+                <th className="pl-4 pr-0 py-3 w-10">
+                  <input
+                    type="checkbox"
+                    aria-label="Pilih semua di halaman ini"
+                    title="Pilih semua di halaman ini"
+                    className="w-4 h-4 rounded border-gray-300 accent-brand cursor-pointer align-middle"
+                    checked={allPageSelected}
+                    ref={(el) => {
+                      if (el) el.indeterminate = somePageSelected && !allPageSelected;
+                    }}
+                    onChange={togglePage}
+                    disabled={loading || paginated.length === 0}
+                  />
+                </th>
                 <SortableHeader label="Nama" field="nama" sortBy={sortBy} sortDir={sortDir} onSort={toggleSort} />
                 <th className="px-4 py-3 font-semibold whitespace-nowrap">Kategori</th>
                 <th className="px-4 py-3 font-semibold whitespace-nowrap">Domisili</th>
@@ -511,7 +629,7 @@ function AdminDashboardContent() {
                 Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)
               ) : applicants.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-16 text-center">
+                  <td colSpan={10} className="px-4 py-16 text-center">
                     <div className="text-ink-muted text-sm">
                       {q || status || kategori
                         ? "Tidak ada pendaftar yang cocok dengan filter ini."
@@ -523,7 +641,21 @@ function AdminDashboardContent() {
                 paginated.map((a) => {
                   const kategoriStyle = KATEGORI_STYLES[a.kategori];
                   return (
-                    <tr key={a.id} className="border-t border-gray-100 hover:bg-gray-50/80 transition-colors">
+                    <tr
+                      key={a.id}
+                      className={`border-t border-gray-100 transition-colors ${
+                        selectedIds.has(a.id) ? "bg-brand-light/30 hover:bg-brand-light/40" : "hover:bg-gray-50/80"
+                      }`}
+                    >
+                      <td className="pl-4 pr-0 py-3 w-10">
+                        <input
+                          type="checkbox"
+                          aria-label={`Pilih ${a.nama}`}
+                          className="w-4 h-4 rounded border-gray-300 accent-brand cursor-pointer align-middle"
+                          checked={selectedIds.has(a.id)}
+                          onChange={() => toggleOne(a.id)}
+                        />
+                      </td>
                       <td className="px-4 py-3">
                         <Link href={`/admin/applicants/${a.id}`} className="flex items-center gap-3 group">
                           <div className="w-8 h-8 rounded-full bg-brand-light text-brand flex items-center justify-center text-xs font-semibold shrink-0 ring-1 ring-brand/10 group-hover:ring-brand/30 transition">
@@ -643,6 +775,52 @@ function AdminDashboardContent() {
           </div>
         )}
       </div>
+
+      {/* Spacer biar bar bawah ga nutupin pagination */}
+      {selectedCount > 0 && <div className="h-20" />}
+
+      {/* Bar aksi massal — muncul pas ada pelamar yang dipilih */}
+      {selectedCount > 0 && (
+        <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-2rem)] max-w-2xl">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-gray-900 text-white shadow-2xl px-4 py-3">
+            <div className="flex items-center gap-3 text-sm">
+              <span>
+                <b className="tabular-nums">{selectedCount}</b> dipilih
+              </span>
+              {selectedCount < selectableTotal && (
+                <button
+                  onClick={selectAllResults}
+                  className="text-xs text-gray-300 underline underline-offset-2 hover:text-white transition"
+                >
+                  Pilih semua {selectableTotal}
+                  {sortedApplicants.length > MAX_BULK ? ` (maks. ${MAX_BULK})` : ""}
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-2 ml-auto">
+              <button
+                onClick={() => setSelectedIds(new Set())}
+                className="rounded-full px-3.5 py-1.5 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition"
+              >
+                Batal
+              </button>
+              <button
+                onClick={() => setBulkOpen(true)}
+                className="rounded-full bg-brand hover:bg-brand-dark px-4 py-1.5 text-sm font-medium text-white transition"
+              >
+                Ubah Status
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <BulkStatusModal
+        open={bulkOpen}
+        onClose={() => setBulkOpen(false)}
+        selected={selectedApplicants}
+        onDone={handleBulkDone}
+      />
     </div>
   );
 }
@@ -699,6 +877,7 @@ function SortableHeader({ label, field, sortBy, sortDir, onSort }) {
 function SkeletonRow() {
   return (
     <tr className="border-t border-gray-100">
+      <td className="pl-4 pr-0 py-3 w-10"><div className="w-4 h-4 rounded bg-gray-100 animate-pulse" /></td>
       <td className="px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse shrink-0" />
